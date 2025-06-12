@@ -14,7 +14,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.1.0
   flutter_map: ^8.1.1
-  lat long2: ^0.9.1
+  latlong2: ^0.9.1
+  one_clock: ^2.0.1
+  linear_progress_bar: ^1.2.0
 
 dev_dependencies:
   flutter_test:
@@ -37,12 +39,11 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
+  fonts:
+     - family: Manrope
+       fonts:
+         - asset: assets/fonts/Manrope-VariableFont_wght.ttf
+           weight: 400
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

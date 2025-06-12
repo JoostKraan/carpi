@@ -3,9 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:latlong2/latlong.dart';
-
+import 'package:app/services.dart';
+import 'package:linear_progress_bar/linear_progress_bar.dart';
+import 'package:one_clock/one_clock.dart';
+Services services = Services();
 void main() {
   runApp(const MyApp());
+  initialize();
+
+}
+void initialize() {
+  services.checkForInternet();
+
 }
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -16,7 +25,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),fontFamily: 'Manrope'
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -34,8 +44,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-
-
   @override
   Widget build(BuildContext context) {
 
@@ -44,19 +52,22 @@ class _MyHomePageState extends State<MyHomePage> {
         preferredSize: Size.fromHeight(50.0),
         child: AppBar(
           backgroundColor: Constants.primaryColor,
-          title: Text("100%",style: TextStyle(color: Constants.fontColor,fontSize:  Constants.textSize)),
-          leading: SvgPicture.asset('assets/icons/fuel.svg',
-            color: Constants.fontColor,
+          title: Row(
+            children: [
+              Text("47L",style: TextStyle(color: Constants.fontColor,fontSize:  Constants.textSize)),
+
+            ],
           ),
-          leadingWidth: 30,
         
           actions: [
             Padding(padding: EdgeInsets.only(right: 10),
-              child:SvgPicture.asset('assets/icons/wifi.svg',
-              color: Constants.iconColor,
-              width: Constants.iconSize,
-              height: Constants.iconSize,
-              ),
+              child: ValueListenableBuilder(valueListenable: services.hasInternet, builder: (context,hasInternet,child){
+                return SvgPicture.asset(hasInternet ? 'assets/icons/wifi.svg' : 'assets/icons/wifi-off.svg',
+                    color: Constants.iconColor,
+                    width: Constants.iconSize,
+                    height: Constants.iconSize);
+              }
+              )
             ),
             Padding(padding: EdgeInsets.only(right: 10),
               child:SvgPicture.asset('assets/icons/bluetooth.svg',
@@ -73,7 +84,12 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Padding(padding: EdgeInsets.only(right: 10),
-              child: Text("Time",style: TextStyle(color: Constants.fontColor,fontSize: Constants.textSize),)
+              child: DigitalClock(
+                digitalClockTextColor: Constants.fontColor,
+
+                  format: "HH:mm",
+                  showSeconds: false,
+                  isLive:true,),
             ),
           ],
         ),
