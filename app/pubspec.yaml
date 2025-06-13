@@ -17,6 +17,7 @@ dependencies:
   latlong2: ^0.9.1
   one_clock: ^2.0.1
   linear_progress_bar: ^1.2.0
+  blur: ^4.0.2
 
 dev_dependencies:
   flutter_test:

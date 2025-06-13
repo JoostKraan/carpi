@@ -4,8 +4,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:app/services.dart';
-import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:one_clock/one_clock.dart';
+import 'package:blur/blur.dart';
+
 Services services = Services();
 void main() {
   runApp(const MyApp());
@@ -46,19 +47,34 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double containerWidth = screenSize.width / 3;
 
     return Scaffold(
+        extendBodyBehindAppBar: true,
       appBar: PreferredSize(
+
         preferredSize: Size.fromHeight(50.0),
         child: AppBar(
+          elevation: 0,
           backgroundColor: Constants.primaryColor,
+          flexibleSpace: Stack(
+            children: [
+              Blur(
+                blur: 2,
+                blurColor: Constants.primaryColor,
+                child: Container(color: Constants.primaryColor.withOpacity(0.01)),
+              ),
+            ],
+          ),
+
           title: Row(
             children: [
               Text("47L",style: TextStyle(color: Constants.fontColor,fontSize:  Constants.textSize)),
 
             ],
           ),
-        
+
           actions: [
             Padding(padding: EdgeInsets.only(right: 10),
               child: ValueListenableBuilder(valueListenable: services.hasInternet, builder: (context,hasInternet,child){
@@ -94,27 +110,41 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      body: Row(
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          Column(
+          Positioned.fill(child: FlutterMap(
+            options: MapOptions(
+              initialCenter: const LatLng(1, 1),
+              initialZoom: 3.2,
+            ),
             children: [
-              SizedBox( height: 600,width: 1000, child: Container(
-                child: FlutterMap(
-                  options: MapOptions(
-                    initialCenter: const LatLng(1, 1),
-                    initialZoom: 3.2,
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.example.app',
-                    ),
-                  ],
+              TileLayer(
+                retinaMode: true,
+                urlTemplate: 'https://tile.jawg.io/jawg-light/{z}/{x}/{y}{r}.png?access-token=ME95gmQBq6fVpZys7OtD6VJLMx706vzQRALB4oZiea5VnbQ7rfH9xjiOIu5wyy5b',
+                userAgentPackageName: 'com.example.app',
                 ),
-              ),)
-            ],
+              ],
+            ),
+          ),
+          Positioned(top: 50,
+              left: 0,
+              width: containerWidth,
+              height: screenSize.height,
+              child: SizedBox(
+                child:
+              Blur(
+                blurColor: Constants.primaryColor,
+                blur: 2,
+                child: Container(
+                  color: Constants.primaryColor,
+                  child: Text("Test"),
+                  ),
+              ),
+              )
           )
-        ],
+
+        ]
       )
     );
   }
