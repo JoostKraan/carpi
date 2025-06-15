@@ -93,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   bottom: 50,
                   right: 0,
                   child: SimpleAttributionWidget(
-                    backgroundColor: Color(0xFFFFFF),
+                    backgroundColor: Color(0x00ffffff),
                     source: Text(
                       style: TextStyle(color: constants.iconColor),
                       'OpenStreetMap contributors',
@@ -188,9 +188,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Positioned(
-            right: 0,
+            left: 380,
             bottom: 0,
-            left: 421,
+
             child: ClipRect(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
