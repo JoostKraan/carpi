@@ -178,6 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                 ),
+                Positioned(top: 5,left: screenSize.width / 3 + 10, child: Text( style: TextStyle(fontSize : constants.fontSize, color: constants.fontColor),"${(data['temp1'] as num).toStringAsFixed(0)}°C")),
                 Positioned(
                   top: 0,
                   bottom: 0,
