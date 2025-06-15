@@ -1,13 +1,11 @@
+import 'dart:async';
 import 'dart:ui';
-
 import 'package:app/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:app/services.dart';
-import 'package:one_clock/one_clock.dart';
-
 
 Services services = Services();
 void main() {
@@ -19,10 +17,8 @@ void initialize() {
   services.checkForInternet();
 }
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
 
   @override
   Widget build(BuildContext context) {
@@ -32,20 +28,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: 'Manrope',
-        dividerTheme: const DividerThemeData(
-          color: Colors.transparent,
-        ),
+        dividerTheme: const DividerThemeData(color: Colors.transparent),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -60,7 +51,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
@@ -68,7 +58,6 @@ class _MyHomePageState extends State<MyHomePage> {
     final LatLng carLocation = LatLng(52.68697352961828, 6.60489107953327);
 
     final constants = Constants(darkmode);
-
 
     return Scaffold(
       backgroundColor: constants.primaryColor,
@@ -106,7 +95,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       point: carLocation,
                       width: 50,
                       height: 50,
-                      child: SvgPicture.asset('assets/icons/Ford-logo-flat.svg'),
+                      child: SvgPicture.asset(
+                        'assets/icons/Ford-logo-flat.svg',
+                      ),
                     ),
                   ],
                 ),
@@ -150,12 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   width: constants.iconSize,
                   height: constants.iconSize,
                 ),
-                DigitalClock(
-                  digitalClockTextColor: constants.fontColor,
-                  format: "HH:mm",
-                  showSeconds: false,
-                  isLive: true,
-                ),
+                ClockWidget(color: constants.fontColor),
               ],
             ),
           ),
@@ -167,17 +153,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 IconButton(
                   onPressed: toggleDarkmode,
                   icon: SvgPicture.asset(
-                      color: constants.iconColor,
-                      'assets/icons/theme-light-dark.svg'),
+                    color: constants.iconColor,
+                    'assets/icons/theme-light-dark.svg',
+                  ),
                 ),
               ],
             ),
           ),
           Positioned(
             top: 0,
-
+            bottom: 0,
             left: 0,
-            height: 635,
             child: ClipRect(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
@@ -189,20 +175,105 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Positioned(
+            left: screenSize.width / 3,
             bottom: 0,
-
             child: ClipRect(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
                 child: Container(
-                  width: screenSize.width,
+                  width: screenSize.width * 2 / 3,
                   height: 50,
                   color: constants.primaryColor,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 5),
+                        child: Text(
+                          "20C",
+                          style: TextStyle(fontSize: constants.fontSize, color: constants.fontColor),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: null,
+                        icon: SvgPicture.asset(
+                          'assets/icons/fan-off.svg',
+                          color: constants.iconColor,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: null,
+                        icon: SvgPicture.asset(
+                          'assets/icons/knob.svg',
+                          color: constants.iconColor,
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "MediaPlayer",
+                            style: TextStyle(color: constants.fontColor),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 60), 
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: SvgPicture.asset(color: constants.iconColor, 'assets/icons/volume-mute.svg'),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
+
         ],
+      ),
+    );
+  }
+}
+class ClockWidget extends StatefulWidget {
+  final Color color;
+
+  const ClockWidget({super.key, required this.color});
+
+  @override
+  State<ClockWidget> createState() => _ClockWidgetState();
+}
+
+class _ClockWidgetState extends State<ClockWidget> {
+  late DateTime now;
+  late final Timer timer;
+
+  @override
+  void initState() {
+    super.initState();
+    now = DateTime.now();
+    timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      setState(() {
+        now = DateTime.now();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final formatted = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+    return Padding(
+      padding: EdgeInsets.only(left: 10,right: 20),
+      child: Text(
+        formatted,
+        style: TextStyle(
+          fontSize: 18,
+          color: widget.color,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }

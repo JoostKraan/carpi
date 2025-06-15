@@ -11,7 +11,7 @@ class Constants {
   final Color iconColor;
 
   final double iconSize;
-  final double textSize;
+  final double fontSize;
   final String mapurl;
 
 
@@ -24,7 +24,7 @@ class Constants {
         fontColor =  dark ? const Color(0xFFFFFFFF) : const Color(0xD10E1314)  ,
         iconColor =  dark ? const Color(0xFFFFFFFF) : const Color(0xD10E1314),
         iconSize = 25,
-        textSize = 16,
+        fontSize = 18,
         mapurl = dark ? "https://tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=ME95gmQBq6fVpZys7OtD6VJLMx706vzQRALB4oZiea5VnbQ7rfH9xjiOIu5wyy5b"
                       : "https://tile.jawg.io/jawg-light/{z}/{x}/{y}{r}.png?access-token=ME95gmQBq6fVpZys7OtD6VJLMx706vzQRALB4oZiea5VnbQ7rfH9xjiOIu5wyy5b";
 }
