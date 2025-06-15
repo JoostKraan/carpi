@@ -175,8 +175,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Positioned(
             top: 0,
-            bottom: 0,
+
             left: 0,
+            height: 635,
             child: ClipRect(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
@@ -188,7 +189,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Positioned(
-            left: 380,
             bottom: 0,
 
             child: ClipRect(
