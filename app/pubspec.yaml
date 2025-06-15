@@ -18,6 +18,8 @@ dependencies:
   one_clock: ^2.0.1
   linear_progress_bar: ^1.2.0
   blur: ^4.0.2
+  flutter_fullscreen: ^1.2.0
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -29,6 +31,7 @@ flutter:
   assets:
     - assets/icons/
     - assets/material3icons/
+    - assets/.env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

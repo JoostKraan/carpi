@@ -2,20 +2,34 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:app/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:app/services.dart';
+import 'package:flutter_fullscreen/flutter_fullscreen.dart';
+
 
 Services services = Services();
-void main() {
+void main() async {
+  await dotenv.load(fileName: 'assets/.env');
   runApp(const MyApp());
   initialize();
+  WidgetsFlutterBinding.ensureInitialized();
+  await FullScreen.ensureInitialized();
+  if (dotenv.get("PLATFORM") == "pi"){
+    FullScreen.setFullScreen(true);
+  }
+  else{
+    FullScreen.setFullScreen(false);
+  }
+
 }
 
 void initialize() {
   services.checkForInternet();
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
