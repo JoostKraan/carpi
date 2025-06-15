@@ -42,3 +42,7 @@ Als creating a [mobile app](https://github.com/JoostKraan/Car-Control-Applicatio
 
 - [Flutter](https://github.com/flutter/flutter)
 - Dart
+
+
+### Progress Pictures
+ <img src="./app/assets/img/screen3.png" alt="Home Page Screenshot" width="300" />
