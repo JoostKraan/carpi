@@ -45,4 +45,6 @@ Als creating a [mobile app](https://github.com/JoostKraan/Car-Control-Applicatio
 
 
 ### Progress Pictures
- <img src="./app/assets/img/screen3.png" alt="Home Page Screenshot" width="300" />
+ <img src="./app/assets/img/screen3.png" alt="Home Page Screenshot" width="800" />
+ Data from esp32 goes through websocket and updates in flutter application
+ Same for gps
