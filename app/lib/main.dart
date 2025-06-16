@@ -79,186 +79,293 @@ class _MyHomePageState extends State<MyHomePage> {
       body: StreamBuilder(
         stream: ws.stream,
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final data = snapshot.data!;
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                Positioned.fill(
-                  child: FlutterMap(
-                    options: MapOptions(
-                      initialCenter: const LatLng(1, 1),
-                      initialZoom: 3.2,
-                    ),
-                    children: [
-                      TileLayer(
-                        retinaMode: true,
-                        urlTemplate: constants.mapurl,
-                        userAgentPackageName: 'com.example.app',
-                      ),
-                      Positioned(
-                        bottom: 50,
-                        right: 0,
-                        child: SimpleAttributionWidget(
-                          backgroundColor: const Color(0x00ffffff),
-                          source: Text(
-                            'OpenStreetMap contributors',
-                            style: TextStyle(color: constants.iconColor),
-                          ),
-                        ),
-                      ),
-                      MarkerLayer(
-                        markers: [
-                          if (data['lat'] != null && data['lng'] != null)
-                            Marker(
-                              point: LatLng(data['lat'] as double, data['lng'] as double),
-                              width: 50,
-                              height: 50,
-                              child: SvgPicture.asset('assets/icons/Ford-logo-flat.svg'),
-                            ),
-                        ],
-                      ),
-                    ],
+          final data = snapshot.hasData
+              ? snapshot.data as Map<String, dynamic>
+              : {'lat': null, 'lng': null, 'temp1': 0.0, 'temp2': 0.0};
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              Positioned.fill(
+                child: FlutterMap(
+                  options: MapOptions(
+                    initialCenter: const LatLng(1, 1),
+                    initialZoom: 3.2,
                   ),
+                  children: [
+                    TileLayer(
+                      retinaMode: true,
+                      urlTemplate: constants.mapurl,
+                      userAgentPackageName: 'com.example.app',
+                    ),
+                    Positioned(
+                      bottom: 50,
+                      right: 0,
+                      child: SimpleAttributionWidget(
+                        backgroundColor: const Color(0x00ffffff),
+                        source: Text(
+                          'OpenStreetMap contributors',
+                          style: TextStyle(color: constants.iconColor),
+                        ),
+                      ),
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        if (data['lat'] != null && data['lng'] != null)
+                          Marker(
+                            point: LatLng(
+                              data['lat'] as double,
+                              data['lng'] as double,
+                            ),
+                            width: 50,
+                            height: 50,
+                            child: SvgPicture.asset(
+                              'assets/icons/Ford-logo-flat.svg',
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
                 ),
-                Positioned(
-                  top: 10,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: ValueListenableBuilder(
-                          valueListenable: services.hasInternet,
-                          builder: (context, hasInternet, child) {
-                            return SvgPicture.asset(
-                              hasInternet
-                                  ? 'assets/material3icons/wifi.svg'
-                                  : 'assets/material3icons/wifi-off.svg',
-                              color: constants.iconColor,
-                              width: constants.iconSize,
-                              height: constants.iconSize,
-                            );
-                          },
-                        ),
+              ),
+              Positioned(
+                top: 10,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: ValueListenableBuilder(
+                        valueListenable: services.hasInternet,
+                        builder: (context, hasInternet, child) {
+                          return SvgPicture.asset(
+                            hasInternet
+                                ? 'assets/material3icons/wifi.svg'
+                                : 'assets/material3icons/wifi-off.svg',
+                            color: constants.iconColor,
+                            width: constants.iconSize,
+                            height: constants.iconSize,
+                          );
+                        },
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: SvgPicture.asset(
-                          'assets/material3icons/bluetooth-disabled.svg',
-                          color: constants.iconColor,
-                          width: constants.iconSize,
-                          height: constants.iconSize,
-                        ),
-                      ),
-                      SvgPicture.asset(
-                        'assets/material3icons/signal-cellular-off.svg',
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: SvgPicture.asset(
+                        'assets/material3icons/bluetooth-disabled.svg',
                         color: constants.iconColor,
                         width: constants.iconSize,
                         height: constants.iconSize,
                       ),
-                      ClockWidget(color: constants.fontColor),
-                    ],
-                  ),
+                    ),
+                    SvgPicture.asset(
+                      'assets/material3icons/signal-cellular-off.svg',
+                      color: constants.iconColor,
+                      width: constants.iconSize,
+                      height: constants.iconSize,
+                    ),
+                    ClockWidget(color: constants.fontColor),
+                  ],
                 ),
-                Positioned(
-                  right: 10,
-                  top: 50,
-                  child: Column(
-                    children: [
-                      IconButton(
-                        onPressed: toggleDarkmode,
-                        icon: SvgPicture.asset(
-                          color: constants.iconColor,
-                          'assets/icons/theme-light-dark.svg',
-                        ),
+              ),
+              Positioned(
+                right: 10,
+                top: 50,
+                child: Column(
+                  children: [
+                    IconButton(
+                      onPressed: toggleDarkmode,
+                      icon: SvgPicture.asset(
+                        color: constants.iconColor,
+                        'assets/icons/theme-light-dark.svg',
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                Positioned(top: 5,left: screenSize.width / 3 + 10, child: Text( style: TextStyle(fontSize : constants.fontSize, color: constants.fontColor),"${(data['temp1'] as num).toStringAsFixed(0)}°C")),
-                Positioned(
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  child: ClipRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-                      child: Container(
-                        width: containerWidth,
-                        color: constants.primaryColor,
+              ),
+              Positioned(
+                top: 5,
+                left: screenSize.width / 3 + 10,
+                child: Text(
+                  style: TextStyle(
+                    fontSize: constants.fontSize,
+                    color: constants.fontColor,
+                  ),
+                  "${(data['temp1'] ?? 0).toStringAsFixed(0)}°C",
+                ),
+              ),
+              Positioned(
+                top: 0,
+                bottom: 0,
+                left: 0,
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                    child: Container(
+                      width: containerWidth,
+                      color: constants.primaryColor,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Spacer(),
+                              Padding(
+                                padding: EdgeInsets.only(top: 10,bottom: 10,right: 30),
+                                child: SvgPicture.asset(
+                                  color: constants.errorColor,
+                                  width: constants.iconSize * 1.5,
+                                  height: constants.iconSize * 1.5,
+                                  'assets/icons/car-brake-parking.svg',
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 10,bottom: 10,right: 30),
+                                child: SvgPicture.asset(
+                                  color: constants.errorColor,
+                                  width: constants.iconSize * 1.5,
+                                  height: constants.iconSize * 1.5,
+                                  'assets/icons/hazard-lights.svg',
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 10),
+                                child: SvgPicture.asset(
+                                  color: constants.accentColor,
+                                  width: constants.iconSize * 1.5,
+                                  height: constants.iconSize * 1.5,
+                                  'assets/icons/car-light-dimmed.svg',
+                                ),
+                              ),
+                              Spacer(),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 25,left: 30),
+                                child: SvgPicture.asset(
+                                  color: constants.successColor,
+                                  width: constants.iconSize * 1.5,
+                                  height: constants.iconSize * 1.5,
+                                  'assets/icons/arrow-left-bold-outline.svg',
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: constants.secondaryColor,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15)
+                                ),
+                                height: 100,
+                                width: containerWidth / 2,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(style: TextStyle(fontSize: constants.fontSize*2.5, color: constants.fontColor), "0"),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(style: TextStyle(fontSize: constants.fontSize*0.8, color: constants.fontColor.withOpacity(0.4)), "km/h"),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 25,right: 30),
+                                child: SvgPicture.asset(
+                                  color: constants.successColor,
+                                  width: constants.iconSize * 1.5,
+                                  height: constants.iconSize * 1.5,
+                                  'assets/icons/arrow-right-bold-outline.svg',
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 50),
+                                child: SvgPicture.asset(color: Colors.white60, width: containerWidth/1.5,height: containerWidth/1.5,'assets/img/Escort_top.svg'),
+                              ),
+                            ],
+                          )
+                        ],
                       ),
                     ),
                   ),
                 ),
-                Positioned(
-                  left: screenSize.width / 3,
-                  bottom: 0,
-                  child: ClipRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-                      child: Container(
-                        width: screenSize.width * 2 / 3,
-                        height: 50,
-                        color: constants.primaryColor,
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                left: 20,
-                                right: 5,
+              ),
+              Positioned(
+                left: screenSize.width / 3,
+                bottom: 0,
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                    child: Container(
+                      width: screenSize.width * 2 / 3,
+                      height: 50,
+                      color: constants.primaryColor,
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20, right: 5),
+                            child: Text(
+                              "${(data['temp2'] ?? 0).toStringAsFixed(0)}°C",
+                              style: TextStyle(
+                                fontSize: constants.fontSize,
+                                color: constants.fontColor,
                               ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: null,
+                            icon: SvgPicture.asset(
+                              'assets/icons/fan-off.svg',
+                              color: constants.iconColor,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: null,
+                            icon: SvgPicture.asset(
+                              'assets/icons/knob.svg',
+                              color: constants.iconColor,
+                            ),
+                          ),
+                          Expanded(
+                            child: Center(
                               child: Text(
-                                "${(data['temp2'] as num).toStringAsFixed(0)}°C"
-                                ,
-                                style: TextStyle(
-                                  fontSize: constants.fontSize,
-                                  color: constants.fontColor,
-                                ),
+                                "MediaPlayer",
+                                style: TextStyle(color: constants.fontColor),
                               ),
                             ),
-                            IconButton(
-                              onPressed: null,
-                              icon: SvgPicture.asset(
-                                'assets/icons/fan-off.svg',
-                                color: constants.iconColor,
-                              ),
+                          ),
+                          const SizedBox(width: 60),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 20),
+                            child: SvgPicture.asset(
+                              'assets/icons/volume-mute.svg',
+                              color: constants.iconColor,
                             ),
-                            IconButton(
-                              onPressed: null,
-                              icon: SvgPicture.asset(
-                                'assets/icons/knob.svg',
-                                color: constants.iconColor,
-                              ),
-                            ),
-                            Expanded(
-                              child: Center(
-                                child: Text(
-                                  "MediaPlayer",
-                                  style: TextStyle(color: constants.fontColor),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 60),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 20),
-                              child: SvgPicture.asset(
-                                'assets/icons/volume-mute.svg',
-                                color: constants.iconColor,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ],
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
+              ),
+            ],
+          );
         },
       ),
     );

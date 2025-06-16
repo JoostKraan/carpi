@@ -15,7 +15,6 @@ class Services{
         final result = await InternetAddress.lookup('google.com');
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           hasInternet.value = true;
-          log('connected $hasInternet');
         }
       }
       on SocketException catch (_) {
