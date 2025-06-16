@@ -204,102 +204,202 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Container(
                       width: containerWidth,
                       color: constants.primaryColor,
-                      child: Column(
+                      child: Stack(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Spacer(),
-                              Padding(
-                                padding: EdgeInsets.only(top: 10,bottom: 10,right: 30),
-                                child: SvgPicture.asset(
-                                  color: constants.errorColor,
-                                  width: constants.iconSize * 1.5,
-                                  height: constants.iconSize * 1.5,
-                                  'assets/icons/car-brake-parking.svg',
+                          Positioned(
+                            left: 15,
+                            top: 15,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: constants.secondaryColor,
                                 ),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 10,bottom: 10,right: 30),
-                                child: SvgPicture.asset(
-                                  color: constants.errorColor,
-                                  width: constants.iconSize * 1.5,
-                                  height: constants.iconSize * 1.5,
-                                  'assets/icons/hazard-lights.svg',
+                              alignment: AlignmentGeometry.center,
+                              height: 35,
+                              width: 90,
+                              child: Text(
+                                style: TextStyle(
+                                  fontSize: constants.fontSize,
+                                  color: constants.fontColor,
                                 ),
+                                "500km",
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 10),
-                                child: SvgPicture.asset(
-                                  color: constants.accentColor,
-                                  width: constants.iconSize * 1.5,
-                                  height: constants.iconSize * 1.5,
-                                  'assets/icons/car-light-dimmed.svg',
-                                ),
-                              ),
-                              Spacer(),
-                            ],
+                            ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          Column(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 25,left: 30),
-                                child: SvgPicture.asset(
-                                  color: constants.successColor,
-                                  width: constants.iconSize * 1.5,
-                                  height: constants.iconSize * 1.5,
-                                  'assets/icons/arrow-left-bold-outline.svg',
-                                ),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: constants.secondaryColor,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Spacer(),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 10,
+                                      bottom: 10,
+                                      right: 30,
+                                    ),
+                                    child: SvgPicture.asset(
+                                      color: constants.errorColor,
+                                      width: constants.iconSize * 1.5,
+                                      height: constants.iconSize * 1.5,
+                                      'assets/icons/car-brake-parking.svg',
+                                    ),
                                   ),
-                                  borderRadius: BorderRadius.circular(15)
-                                ),
-                                height: 100,
-                                width: containerWidth / 2,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 10,
+                                      bottom: 10,
+                                      right: 30,
+                                    ),
+                                    child: SvgPicture.asset(
+                                      color: constants.errorColor,
+                                      width: constants.iconSize * 1.5,
+                                      height: constants.iconSize * 1.5,
+                                      'assets/icons/hazard-lights.svg',
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 10,
+                                      bottom: 10,
+                                    ),
+                                    child: SvgPicture.asset(
+                                      color: constants.accentColor,
+                                      width: constants.iconSize * 1.5,
+                                      height: constants.iconSize * 1.5,
+                                      'assets/icons/car-light-dimmed.svg',
+                                    ),
+                                  ),
+                                  Spacer(),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 25,
+                                      left: 30,
+                                    ),
+                                    child: SvgPicture.asset(
+                                      color: constants.successColor,
+                                      width: constants.iconSize * 1.5,
+                                      height: constants.iconSize * 1.5,
+                                      'assets/icons/arrow-left-bold-outline.svg',
+                                    ),
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: constants.secondaryColor,
+                                      ),
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    height: 100,
+                                    width: containerWidth / 2,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
-                                        Text(style: TextStyle(fontSize: constants.fontSize*2.5, color: constants.fontColor), "0"),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              style: TextStyle(
+                                                fontSize:
+                                                    constants.fontSize * 2.5,
+                                                color: constants.fontColor,
+                                              ),
+                                              "0",
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              style: TextStyle(
+                                                fontSize:
+                                                    constants.fontSize * 0.8,
+                                                color: constants.fontColor
+                                                    .withOpacity(0.4),
+                                              ),
+                                              "km/h",
+                                            ),
+                                          ],
+                                        ),
                                       ],
                                     ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(style: TextStyle(fontSize: constants.fontSize*0.8, color: constants.fontColor.withOpacity(0.4)), "km/h"),
-                                      ],
-                                    )
-                                  ],
-                                ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 25,
+                                      right: 30,
+                                    ),
+                                    child: SvgPicture.asset(
+                                      color: constants.successColor,
+                                      width: constants.iconSize * 1.5,
+                                      height: constants.iconSize * 1.5,
+                                      'assets/icons/arrow-right-bold-outline.svg',
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 25,right: 30),
-                                child: SvgPicture.asset(
-                                  color: constants.successColor,
-                                  width: constants.iconSize * 1.5,
-                                  height: constants.iconSize * 1.5,
-                                  'assets/icons/arrow-right-bold-outline.svg',
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 50),
+                                    child: SvgPicture.asset(
+                                      color: Colors.white60,
+                                      width: containerWidth / 1.5,
+                                      height: containerWidth / 1.5,
+                                      'assets/img/Escort_top.svg',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 30),
+                                    child: Container(
+                                      width: containerWidth / 1.3,
+                                      height: containerWidth / 3,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: constants.secondaryColor,
+                                        ),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                style: TextStyle(
+                                                  color: constants.fontColor,
+                                                ),
+                                                "info??????????????? ",
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 50),
-                                child: SvgPicture.asset(color: Colors.white60, width: containerWidth/1.5,height: containerWidth/1.5,'assets/img/Escort_top.svg'),
-                              ),
-                            ],
-                          )
                         ],
                       ),
                     ),
