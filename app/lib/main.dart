@@ -109,14 +109,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       MarkerLayer(
                         markers: [
-                          Marker(
-                            point: LatLng(data['lat'], data['lng']),
-                            width: 50,
-                            height: 50,
-                            child: SvgPicture.asset(
-                              'assets/icons/Ford-logo-flat.svg',
+                          if (data['lat'] != null && data['lng'] != null)
+                            Marker(
+                              point: LatLng(data['lat'] as double, data['lng'] as double),
+                              width: 50,
+                              height: 50,
+                              child: SvgPicture.asset('assets/icons/Ford-logo-flat.svg'),
                             ),
-                          ),
                         ],
                       ),
                     ],
