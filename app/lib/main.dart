@@ -206,30 +206,34 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: constants.primaryColor,
                       child: Stack(
                         children: [
-                          Positioned(
-                            left: 15,
-                            top: 15,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: constants.secondaryColor,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              alignment: AlignmentGeometry.center,
-                              height: 35,
-                              width: 90,
-                              child: Text(
-                                style: TextStyle(
-                                  fontSize: constants.fontSize,
-                                  color: constants.fontColor,
-                                ),
-                                "500km",
-                              ),
-                            ),
-                          ),
                           Column(
                             children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: constants.secondaryColor,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      alignment: AlignmentGeometry.center,
+                                      height: 35,
+                                      width: 90,
+                                      child: Text(
+                                        style: TextStyle(
+                                          fontSize: constants.fontSize,
+                                          color: constants.fontColor,
+                                        ),
+                                        "500km",
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -356,7 +360,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 50),
+                                    padding: const EdgeInsets.only(top: 20),
                                     child: SvgPicture.asset(
                                       color: Colors.white60,
                                       width: containerWidth / 1.5,
