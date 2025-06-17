@@ -2,11 +2,7 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
 
-
-
-
 class Services{
-
   final ValueNotifier<bool> hasInternet = ValueNotifier(true);
   Future<void> checkForInternet() async {
     while(true){
@@ -24,7 +20,6 @@ class Services{
       }
     }
   }
-
   }
   
 

@@ -9,11 +9,9 @@ class Constants {
   final Color successColor;
   final Color fontColor;
   final Color iconColor;
-
   final double iconSize;
   final double fontSize;
   final String mapurl;
-
 
   Constants(bool dark)
       : primaryColor = dark ? const Color(0xBE1A1A1A) : const Color(0x83F6F6F4),

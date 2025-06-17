@@ -1,47 +1,57 @@
-import 'dart:convert';
 import 'dart:async';
-import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_libserialport/flutter_libserialport.dart';
 
-class WebSocketService {
- 
-  static final WebSocketService _instance = WebSocketService._internal();
-  factory WebSocketService() => _instance;
-  late final WebSocketChannel _channel;
-  final _url = 'ws://${dotenv.get('RECEIVER')}:8000/ws';
+class SerialReader {
+  static const String portName = 'COM3';
+  late SerialPort esp32Port;
+  SerialPortReader? reader;
 
-  double? lat;
-  double? lng;
-  double? temp1;
-  double? temp2;
+  final StreamController<String> _dataController = StreamController<String>.broadcast();
+  Stream<String> get dataStream => _dataController.stream;
 
-  final _controller = StreamController<Map<String, dynamic>>.broadcast();
-
-  WebSocketService._internal() {
-    _channel = WebSocketChannel.connect(Uri.parse(_url));
-    _channel.stream.listen((event) {
-      print('[WS RECEIVED]: $event');
-
-      try {
-        final decoded = jsonDecode(event);
-        if (decoded is Map<String, dynamic>) {
-          lat = decoded['lat'];
-          lng = decoded['lng'];
-          temp1 = decoded['temp1'];
-          temp2 = decoded['temp2'];
-
-          _controller.add(decoded);
-        } else {
-          throw Exception('Expected Map<String, dynamic>, got: ${decoded.runtimeType}');
-        }
-      } catch (e) {
-        print('[WS ERROR]: $e');
-      }
-    });
+  SerialReader() {
+    esp32Port = SerialPort(portName);
   }
-  Stream<Map<String, dynamic>> get stream => _controller.stream;
+
+  void readData() {
+    try {
+      if (esp32Port.isOpen) {
+        esp32Port.close();
+      }
+
+      if (!esp32Port.openReadWrite()) {
+        print('Failed to open serial port: ${SerialPort.lastError}');
+        return;
+      }
+
+      reader = SerialPortReader(esp32Port);
+
+      reader!.stream.listen(
+            (data) {
+          final chunk = String.fromCharCodes(data);
+          _dataController.add(chunk);
+        },
+        onError: (error) {
+          print('Serial read error: $error');
+          _dataController.addError(error);
+        },
+      );
+    } catch (e) {
+      print('Exception while opening/reading serial port: $e');
+      _dataController.addError(e);
+    }
+  }
+
   void dispose() {
-    _channel.sink.close();
-    _controller.close();
+    try {
+      reader?.close();
+      if (esp32Port.isOpen) {
+        esp32Port.close();
+      }
+      esp32Port.dispose();
+      _dataController.close();
+    } catch (e) {
+      print('Exception during dispose: $e');
+    }
   }
 }
