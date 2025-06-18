@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:app/clock.dart';
 import 'package:app/music_player.dart';
+import 'package:app/providers/constants-provider.dart';
 import 'package:app/theme.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -10,7 +12,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:app/services.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
+import 'package:provider/provider.dart';
 import 'esp32-data-reciever.dart';
+import 'info_tab.dart';
 
 Services services = Services();
 
@@ -25,7 +29,12 @@ void main() async {
   } else {
     FullScreen.setFullScreen(false);
   }
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ConstantsProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 void initialize() {
@@ -59,6 +68,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late SerialReader serialReader;
+  int _currentIndex = 0;
+
+  final List<Widget> _carouselItems = [
+    MusicPlayer(),
+    carInfo(),
+  ];
+
 
   @override
   void initState() {
@@ -73,19 +89,11 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  bool darkmode = true;
-
-  void toggleDarkmode() {
-    setState(() {
-      darkmode = !darkmode;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final double containerWidth = screenSize.width / 3;
-    final constants = Constants(darkmode);
+    final constants = context.watch<ConstantsProvider>().constants;
 
     return Scaffold(
       backgroundColor: constants.primaryColor,
@@ -175,7 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       width: constants.iconSize,
                       height: constants.iconSize,
                     ),
-                    ClockWidget(color: constants.fontColor)
+                    ClockWidget(color: constants.fontColor),
                   ],
                 ),
               ),
@@ -185,7 +193,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   children: [
                     IconButton(
-                      onPressed: toggleDarkmode,
+                      onPressed: () =>
+                          context.read<ConstantsProvider>().toggleDarkMode(),
                       icon: SvgPicture.asset(
                         color: constants.iconColor,
                         'assets/icons/theme-light-dark.svg',
@@ -396,14 +405,55 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                 ],
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 15),
-                                    child: MusicPlayer(),
-                                  ),
-                                ],
+                              Padding(
+                                padding: const EdgeInsets.only(top: 15),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          height: screenSize.height / 5,
+                                          width: screenSize.width / 3,
+                                          child: CarouselSlider(
+                                            items: _carouselItems,
+                                            options: CarouselOptions(
+                                              viewportFraction: 1.0,
+                                              enlargeCenterPage: false,
+                                              enableInfiniteScroll: false,
+                                              onPageChanged: (index, reason) {
+                                                setState(() {
+                                                  _currentIndex = index;
+                                                });
+                                              },
+                                            ),
+                                          ),
+
+                                        ),
+
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 5),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: _carouselItems.asMap().entries.map((entry) {
+                                          return Container(
+                                            width: 8.0,
+                                            height: 8.0,
+                                            margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: _currentIndex == entry.key
+                                                  ? Colors.white
+                                                  : Colors.white.withOpacity(0.4),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -444,6 +494,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           IconButton(
                             onPressed: null,
                             icon: SvgPicture.asset(
+                              width: constants.iconSize*1.3,
+                              height: constants.iconSize*1.3,
                               'assets/icons/fan-off.svg',
                               color: constants.iconColor,
                             ),
@@ -451,15 +503,23 @@ class _MyHomePageState extends State<MyHomePage> {
                           IconButton(
                             onPressed: null,
                             icon: SvgPicture.asset(
+                              width: constants.iconSize*1.3,
+                              height: constants.iconSize*1.3,
                               'assets/icons/knob.svg',
                               color: constants.iconColor,
                             ),
+                          ),
+                          Padding(
+                              padding: const EdgeInsets.only(left: 1),
+                              child: Text(style: TextStyle(fontSize: constants.fontSize, color: constants.iconColor), "30%")
                           ),
                           Spacer(),
                           const SizedBox(width: 60),
                           Padding(
                             padding: const EdgeInsets.only(right: 20),
                             child: SvgPicture.asset(
+                              width: constants.iconSize*1.3,
+                              height: constants.iconSize*1.3,
                               'assets/icons/volume-mute.svg',
                               color: constants.iconColor,
                             ),

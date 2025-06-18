@@ -1,6 +1,8 @@
+import 'package:app/providers/constants-provider.dart';
 import 'package:app/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'get_audio.dart';
 
 class MusicPlayer extends StatefulWidget {
@@ -34,21 +36,17 @@ class _MusicPlayerState extends State<MusicPlayer> {
 
   @override
   void dispose() {
-
     mediaWebSocket.close();
     super.dispose();
   }
 
   @override
-
   Widget build(BuildContext context) {
-    final constants = Constants(true);
+    final constants = context.watch<ConstantsProvider>().constants;
     final Size screenSize = MediaQuery.of(context).size;
-    return  Container(
+    return Container(
       decoration: BoxDecoration(
-        border: Border.all(
-          color: constants.secondaryColor,
-        ),
+        border: Border.all(color: constants.secondaryColor),
         borderRadius: BorderRadius.circular(8),
       ),
       alignment: Alignment.center,
@@ -58,41 +56,30 @@ class _MusicPlayerState extends State<MusicPlayer> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Row(
-            mainAxisAlignment:
-            MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  color: constants.fontColor,
-                ),
-              ),
+              Text(title, style: TextStyle(color: constants.fontColor)),
             ],
           ),
           Row(
-            mainAxisAlignment:
-            MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                style: TextStyle(
-                  color: constants.fontColor,
-                ),
-                artist,
-              ),
+              Text(style: TextStyle(color: constants.fontColor), artist),
             ],
           ),
           Row(
-            mainAxisAlignment:
-            MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 10,bottom: 10),
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
                 child: SizedBox(
                   width: screenSize.width / 5,
                   height: 3,
                   child: LinearProgressIndicator(
-                    value: 1,
+                    backgroundColor: constants.secondaryColor,
+                    value: 30,
                     color: constants.accentColor,
+                    year2023: false,
                   ),
                 ),
               ),
@@ -100,63 +87,59 @@ class _MusicPlayerState extends State<MusicPlayer> {
           ),
           Row(
             spacing: 20,
-            mainAxisAlignment:
-            MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FloatingActionButton.small(
-
-                elevation: 0,
-                backgroundColor:
-                constants.accentColor,
-                foregroundColor:
-                constants.iconColor,
-                onPressed: null,
+                backgroundColor: constants.accentColor,
+                foregroundColor: constants.iconColor,
+                onPressed: () {
+                  print("shit");
+                },
                 child: SvgPicture.asset(
                   width: constants.iconSize,
                   height: constants.iconSize,
-                  'assets/icons/shuffle-disabled.svg',
+                  'assets/material3icons/shuffle3.svg',
+                  color: constants.iconColor,
+                ),
+              ),
+              FloatingActionButton.small(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                backgroundColor: constants.accentColor,
+                foregroundColor: constants.iconColor,
+                onPressed: () {
+                  print("shit");
+                },
+                child: SvgPicture.asset(
+                  'assets/material3icons/skip-previous3.svg',
+                  width: constants.iconSize,
+                  height: constants.iconSize,
+                  color: constants.iconColor,
+                ),
+              ),
+              FloatingActionButton.small(
+                backgroundColor: constants.accentColor,
+                foregroundColor: constants.iconColor,
+                onPressed: () {
+                  print("shit");
+                },
+                child: SvgPicture.asset(
+                  width: constants.iconSize,
+                  height: constants.iconSize,
+                  'assets/material3icons/play3.svg',
                   color: constants.iconColor,
                 ),
               ),
               FloatingActionButton.small(
                 elevation: 0,
-                backgroundColor:
-                constants.accentColor,
-                foregroundColor:
-                constants.iconColor,
-                onPressed: null,
-                child: SvgPicture.asset(
-                  'assets/icons/skip-previous.svg',
-                  width: constants.iconSize,
-                  height: constants.iconSize,
-                  color: constants.iconColor,
-                ),
-              ),
-              FloatingActionButton.small(
-                elevation: 0,
-                backgroundColor:
-                constants.accentColor,
-                foregroundColor:
-                constants.iconColor,
-                onPressed: null,
+                backgroundColor: constants.accentColor,
+                foregroundColor: constants.iconColor,
+                onPressed: () {
+                  print("shit");
+                },
                 child: SvgPicture.asset(
                   width: constants.iconSize,
                   height: constants.iconSize,
-                  'assets/icons/play.svg',
-                  color: constants.iconColor,
-                ),
-              ),
-              FloatingActionButton.small(
-                elevation: 0,
-                backgroundColor:
-                constants.accentColor,
-                foregroundColor:
-                constants.iconColor,
-                onPressed: null,
-                child: SvgPicture.asset(
-                  width: constants.iconSize,
-                  height: constants.iconSize,
-                  'assets/icons/skip-next.svg',
+                  'assets/material3icons/skip-next3.svg',
                   color: constants.iconColor,
                 ),
               ),

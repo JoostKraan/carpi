@@ -23,6 +23,7 @@ dependencies:
   web_socket_channel: ^3.0.3
   flutter_libserialport: ^0.5.0
   carousel_slider: ^5.1.1
+  provider: ^6.1.5
 
 dev_dependencies:
   flutter_test:
