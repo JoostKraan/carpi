@@ -1,6 +1,7 @@
 # carpi 
 
 Custom car infotaintment system using a Raspberri Pi 5 4gb and ESP32-WROVER
+Car is an 1986 Ford escort MKIV Convertible
 
 This application is meant to read out data from the car and display that on a screen.
 Als creating a [mobile app](https://github.com/JoostKraan/Car-Control-Application) to control car features
@@ -8,16 +9,20 @@ Als creating a [mobile app](https://github.com/JoostKraan/Car-Control-Applicatio
 
 - Turn by turn navigation
 - Central locking functionality 
-- Throttle Input 
+- Throttle Input reading
+- electrically controlled windows
 - Display status lights in app (high beam, low beam, indicators ETC)
 - Media player for controling phone media and playing through radio
+- Parking sensors using ultrasonic sensors
+- Integrated camera's for dashcam usage / blind spot view
+- Car speed reading using hall effect sensor
 
-## Sensor Readouts
+## Current Features 
 
-- Outside Temperature
-- Interior Temperature
-- Gps location
-- Speed Sensor (hall effect sensor)
+- Two temperature read
+- Gps location read
+- music metadata displayed in app when connected with bluetooth
+- Interactable map
 
 ## Hardware
 
@@ -46,5 +51,4 @@ Als creating a [mobile app](https://github.com/JoostKraan/Car-Control-Applicatio
 
 ### Progress Pictures
  <img src="./app/assets/img/screen3.png" alt="Home Page Screenshot" width="800" />
- Data from esp32 goes through websocket and updates in flutter application
- Same for gps
+ Serial data from esp32 sensors gets picked up by flutter app and displayed as temperatures and car location
