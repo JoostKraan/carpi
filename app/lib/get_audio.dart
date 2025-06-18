@@ -41,8 +41,8 @@ class MediaWebSocket {
   }
 
   void sendCommand(String command) {
-    final msg = jsonEncode({'command': command});
-    _channel.sink.add(msg);
+    print("Sending raw command: $command");
+    _channel.sink.add(command);
   }
 
   void close() {

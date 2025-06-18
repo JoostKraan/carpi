@@ -16,6 +16,13 @@ class _MusicPlayerState extends State<MusicPlayer> {
   String title = 'No song available';
   String artist = 'No artist available';
   String album = 'Loading...';
+  int duration = 0;
+  int position = 0;
+  bool isPlaying = false;
+  List<String> availableCommands = [];
+
+  // Optimistic UI override for playing state
+  bool? optimisticIsPlaying;
 
   @override
   void initState() {
@@ -29,6 +36,12 @@ class _MusicPlayerState extends State<MusicPlayer> {
         title = data['title'] ?? 'Unknown Title';
         artist = data['artist'] ?? 'Unknown Artist';
         album = data['album'] ?? 'Unknown Album';
+        duration = data['duration'] ?? 0;
+        position = data['position'] ?? 0;
+        isPlaying = data['isPlaying'] ?? false;
+        availableCommands = List<String>.from(data['availableCommands'] ?? []);
+        // Reset optimistic override on backend update
+        optimisticIsPlaying = null;
       });
     });
   }
@@ -39,10 +52,17 @@ class _MusicPlayerState extends State<MusicPlayer> {
     super.dispose();
   }
 
+  bool _can(String command) => availableCommands.contains(command);
+
+  bool get effectiveIsPlaying => optimisticIsPlaying ?? isPlaying;
+
   @override
   Widget build(BuildContext context) {
     final constants = context.watch<ConstantsProvider>().constants;
     final Size screenSize = MediaQuery.of(context).size;
+
+    double progressValue = duration > 0 ? position / duration : 0.0;
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: constants.secondaryColor),
@@ -54,97 +74,79 @@ class _MusicPlayerState extends State<MusicPlayer> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(title, style: TextStyle(color: constants.fontColor)),
-            ],
+          Text(title, style: TextStyle(color: constants.fontColor)),
+          Text(artist, style: TextStyle(color: constants.fontColor)),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: SizedBox(
+              width: screenSize.width / 5,
+              height: 3,
+              child: LinearProgressIndicator(
+                backgroundColor: constants.secondaryColor,
+                value: progressValue.clamp(0.0, 1.0),
+                color: constants.accentColor,
+              ),
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(style: TextStyle(color: constants.fontColor), artist),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 10),
-                child: SizedBox(
-                  width: screenSize.width / 5,
-                  height: 3,
-                  child: LinearProgressIndicator(
-                    backgroundColor: constants.secondaryColor,
-                    value: 30,
-                    color: constants.accentColor,
-                    year2023: false,
-                  ),
-                ),
+              _buildControlButton(
+                icon: 'shuffle3.svg',
+                onPressed: () => mediaWebSocket.sendCommand('toggle_shuffle'),
+                enabled: _can('toggle_shuffle'),
               ),
-            ],
-          ),
-          Row(
-            spacing: 20,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FloatingActionButton.small(
-                backgroundColor: constants.accentColor,
-                foregroundColor: constants.iconColor,
-                onPressed: () {
-                  print("shit");
-                },
-                child: SvgPicture.asset(
-                  width: constants.iconSize,
-                  height: constants.iconSize,
-                  'assets/material3icons/shuffle3.svg',
-                  color: constants.iconColor,
-                ),
+              _buildControlButton(
+                icon: 'skip-previous3.svg',
+                onPressed: () => mediaWebSocket.sendCommand('previous'),
+                enabled: _can('previous'),
               ),
-              FloatingActionButton.small(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                backgroundColor: constants.accentColor,
-                foregroundColor: constants.iconColor,
+              _buildControlButton(
+                icon: effectiveIsPlaying ? 'pause3.svg' : 'play3.svg',
                 onPressed: () {
-                  print("shit");
+                  final command = effectiveIsPlaying ? 'pause' : 'play';
+                  // Optimistic UI update
+                  setState(() {
+                    optimisticIsPlaying = !effectiveIsPlaying;
+                  });
+                  mediaWebSocket.sendCommand(command);
                 },
-                child: SvgPicture.asset(
-                  'assets/material3icons/skip-previous3.svg',
-                  width: constants.iconSize,
-                  height: constants.iconSize,
-                  color: constants.iconColor,
-                ),
+                enabled: _can(effectiveIsPlaying ? 'pause' : 'play'),
               ),
-              FloatingActionButton.small(
-                backgroundColor: constants.accentColor,
-                foregroundColor: constants.iconColor,
-                onPressed: () {
-                  print("shit");
-                },
-                child: SvgPicture.asset(
-                  width: constants.iconSize,
-                  height: constants.iconSize,
-                  'assets/material3icons/play3.svg',
-                  color: constants.iconColor,
-                ),
-              ),
-              FloatingActionButton.small(
-                elevation: 0,
-                backgroundColor: constants.accentColor,
-                foregroundColor: constants.iconColor,
-                onPressed: () {
-                  print("shit");
-                },
-                child: SvgPicture.asset(
-                  width: constants.iconSize,
-                  height: constants.iconSize,
-                  'assets/material3icons/skip-next3.svg',
-                  color: constants.iconColor,
-                ),
+              _buildControlButton(
+                icon: 'skip-next3.svg',
+                onPressed: () => mediaWebSocket.sendCommand('next'),
+                enabled: _can('next'),
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildControlButton({
+    required String icon,
+    required VoidCallback onPressed,
+    required bool enabled,
+  }) {
+    final constants = context.read<ConstantsProvider>().constants;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Opacity(
+        opacity: enabled ? 1.0 : 0.3,
+        child: FloatingActionButton.small(
+          backgroundColor: constants.accentColor,
+          foregroundColor: constants.iconColor,
+          onPressed: enabled ? onPressed : null,
+          child: SvgPicture.asset(
+            'assets/material3icons/$icon',
+            width: constants.iconSize,
+            height: constants.iconSize,
+            color: constants.iconColor,
+          ),
+        ),
       ),
     );
   }
