@@ -1,9 +1,8 @@
-import 'dart:async';
 import 'dart:ui';
 import 'package:app/clock.dart';
 import 'package:app/music_player.dart';
 import 'package:app/providers/constants-provider.dart';
-import 'package:app/theme.dart';
+import 'package:app/providers/volume_provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,8 +12,10 @@ import 'package:latlong2/latlong.dart';
 import 'package:app/services.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'package:provider/provider.dart';
+import 'package:volume_controller/volume_controller.dart';
 import 'esp32-data-reciever.dart';
 import 'info_tab.dart';
+import 'volume_slider.dart';
 
 Services services = Services();
 
@@ -29,10 +30,14 @@ void main() async {
   } else {
     FullScreen.setFullScreen(false);
   }
+
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ConstantsProvider(),
-      child: const MyApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ConstantsProvider()),
+        ChangeNotifierProvider(create: (_) => VolumeProvider()),
+      ],
+      child: const MyApp(),    // ← here’s the missing child
     ),
   );
 }
@@ -70,10 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late SerialReader serialReader;
   int _currentIndex = 0;
 
-  final List<Widget> _carouselItems = [
-    MusicPlayer(),
-    carInfo(),
-  ];
+  final List<Widget> _carouselItems = [MusicPlayer(), carInfo()];
 
 
   @override
@@ -81,6 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     serialReader = SerialReader();
     serialReader.readData();
+
   }
 
   @override
@@ -94,6 +97,10 @@ class _MyHomePageState extends State<MyHomePage> {
     final Size screenSize = MediaQuery.of(context).size;
     final double containerWidth = screenSize.width / 3;
     final constants = context.watch<ConstantsProvider>().constants;
+    final vol = context.watch<VolumeProvider>().volume;  // 0.0–1.0
+    final perc = (vol*100).round();
+
+    // 0–100%
 
     return Scaffold(
       backgroundColor: constants.primaryColor,
@@ -115,17 +122,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       retinaMode: true,
                       urlTemplate: constants.mapurl,
                       userAgentPackageName: 'com.example.app',
-                    ),
-                    Positioned(
-                      bottom: 50,
-                      right: 0,
-                      child: SimpleAttributionWidget(
-                        backgroundColor: const Color(0x00ffffff),
-                        source: Text(
-                          'OpenStreetMap contributors',
-                          style: TextStyle(color: constants.iconColor),
-                        ),
-                      ),
                     ),
                     MarkerLayer(
                       markers: [
@@ -205,6 +201,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
               ),
+              Positioned(
+                bottom: 40,
+                right: 35,
+                child: VolumeControl(),
+
+              ),
+
+
+
               Positioned(
                 top: 5,
                 left: screenSize.width / 3 + 10,
@@ -410,7 +415,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: Column(
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         SizedBox(
                                           height: screenSize.height / 5,
@@ -428,28 +434,36 @@ class _MyHomePageState extends State<MyHomePage> {
                                               },
                                             ),
                                           ),
-
                                         ),
-
                                       ],
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 5),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: _carouselItems.asMap().entries.map((entry) {
-                                          return Container(
-                                            width: 8.0,
-                                            height: 8.0,
-                                            margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: _currentIndex == entry.key
-                                                  ? Colors.white
-                                                  : Colors.white.withOpacity(0.4),
-                                            ),
-                                          );
-                                        }).toList(),
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: _carouselItems
+                                            .asMap()
+                                            .entries
+                                            .map((entry) {
+                                              return Container(
+                                                width: 8.0,
+                                                height: 8.0,
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 4.0,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color:
+                                                      _currentIndex == entry.key
+                                                      ? Colors.white
+                                                      : Colors.white
+                                                            .withOpacity(0.4),
+                                                ),
+                                              );
+                                            })
+                                            .toList(),
                                       ),
                                     ),
                                   ],
@@ -494,8 +508,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           IconButton(
                             onPressed: null,
                             icon: SvgPicture.asset(
-                              width: constants.iconSize*1.3,
-                              height: constants.iconSize*1.3,
+                              width: constants.iconSize * 1.3,
+                              height: constants.iconSize * 1.3,
                               'assets/icons/fan-off.svg',
                               color: constants.iconColor,
                             ),
@@ -503,25 +517,45 @@ class _MyHomePageState extends State<MyHomePage> {
                           IconButton(
                             onPressed: null,
                             icon: SvgPicture.asset(
-                              width: constants.iconSize*1.3,
-                              height: constants.iconSize*1.3,
+                              width: constants.iconSize * 1.3,
+                              height: constants.iconSize * 1.3,
                               'assets/icons/knob.svg',
                               color: constants.iconColor,
                             ),
                           ),
                           Padding(
-                              padding: const EdgeInsets.only(left: 1),
-                              child: Text(style: TextStyle(fontSize: constants.fontSize, color: constants.iconColor), "30%")
+                            padding: const EdgeInsets.only(left: 1),
+                            child: Text(
+                              style: TextStyle(
+                                fontSize: constants.fontSize,
+                                color: constants.iconColor,
+                              ),
+                              "30%",
+                            ),
                           ),
                           Spacer(),
                           const SizedBox(width: 60),
                           Padding(
                             padding: const EdgeInsets.only(right: 20),
-                            child: SvgPicture.asset(
-                              width: constants.iconSize*1.3,
-                              height: constants.iconSize*1.3,
-                              'assets/icons/volume-mute.svg',
-                              color: constants.iconColor,
+                            child: IconButton(
+                              onPressed: () {
+                                // toggle between mute and full volume
+                                if (vol == 0) {
+                                  context.read<VolumeProvider>().volume = 1.0;
+                                } else {
+                                  context.read<VolumeProvider>().volume = 0.0;
+                                }
+                              },
+                              icon: SvgPicture.asset(
+                                vol <= 0
+                                    ? 'assets/material3icons/volume_off.svg'
+                                    : vol < 0.5
+                                    ? 'assets/material3icons/volume_down.svg'
+                                    : 'assets/material3icons/volume_up.svg',
+                                width: constants.iconSize * 1.3,
+                                height: constants.iconSize * 1.3,
+                                color: constants.iconColor,
+                              ),
                             ),
                           ),
                         ],

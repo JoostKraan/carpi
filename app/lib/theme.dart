@@ -1,8 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 class Constants{
-
 
   final Color primaryColor;
   final Color secondaryColor;

@@ -1,5 +1,4 @@
 import 'package:app/providers/constants-provider.dart';
-import 'package:app/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
