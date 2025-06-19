@@ -28,7 +28,17 @@ class SerialReader {
 
       reader!.stream.listen(
             (data) {
-          final chunk = String.fromCharCodes(data);
+          final chunk = String.fromCharCodes(data).trim();
+          final fixedChunk = chunk.split(',');
+          if (fixedChunk.length >= 4){
+            final temp1 = fixedChunk[3];
+            final temp2 = fixedChunk[4];
+            print("split string : $temp2 $temp1");
+            print("default string : $chunk");
+          }
+          else{
+            return;
+          }
           _dataController.add(chunk);
         },
         onError: (error) {

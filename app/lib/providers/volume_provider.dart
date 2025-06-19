@@ -8,19 +8,18 @@ class VolumeProvider extends ChangeNotifier {
     // fetch initial value
     VolumeController.instance.getVolume().then((v) {
       _vol = v; notifyListeners();
-      print("🔊 [VolumeProvider] set via setter: $_vol");
+
     });
     // subscribe to hardware / external changes
     VolumeController.instance.addListener((v) {
       _vol = v; notifyListeners();
-      print("🔊 [VolumeProvider] set via setter: $_vol");
+
     }, fetchInitialVolume: false);
   }
 
   double get volume => _vol;
   set volume(double v) {
     VolumeController.instance.setVolume(v.clamp(0,1));
-    print("🔊 [VolumeProvider] external volume change: $_vol");
   }
 
   @override

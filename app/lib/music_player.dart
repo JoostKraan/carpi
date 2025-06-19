@@ -33,9 +33,9 @@ class _MusicPlayerState extends State<MusicPlayer> {
     mediaWebSocket.metadataStream.listen((data) {
       if (!mounted) return;
       setState(() {
-        title = data['title'] ?? 'Unknown Title';
-        artist = data['artist'] ?? 'Unknown Artist';
-        album = data['album'] ?? 'Unknown Album';
+        title = data['metadata']['Title'] ?? 'Unknown Title';
+        artist = data['metadata']['Artist'] ?? 'Unknown Artist';
+        album = data['metadata']['Album'] ?? 'Unknown Album';
         duration = data['duration'] ?? 0;
         position = data['position'] ?? 0;
         isPlaying = data['isPlaying'] ?? false;
@@ -74,7 +74,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(title, style: TextStyle(color: constants.fontColor)),
+          Text( overflow: TextOverflow.clip, title, style: TextStyle(color: constants.fontColor)),
           Text(artist, style: TextStyle(color: constants.fontColor)),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),

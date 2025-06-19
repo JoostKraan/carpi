@@ -19,14 +19,14 @@ class MediaWebSocket {
           (message) {
         try {
           if (message is String && message.trim().startsWith('{')) {
-            final fixedMessage = message.replaceAll("'", '"');
-            final decoded = jsonDecode(fixedMessage);
+            final decoded = jsonDecode(message); // <- no replaceAll here!
             if (decoded is Map<String, dynamic>) {
               _metadataController.add(decoded);
             }
           }
         } catch (e) {
           print('Error decoding message: $e');
+          print('Raw message: $message');
         }
       },
       onDone: () {
@@ -38,10 +38,11 @@ class MediaWebSocket {
         _metadataController.addError(error);
       },
     );
+
   }
 
   void sendCommand(String command) {
-    print("Sending raw command: $command");
+
     _channel.sink.add(command);
   }
 
