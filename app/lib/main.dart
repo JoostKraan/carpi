@@ -5,6 +5,7 @@ import 'package:app/providers/constants-provider.dart';
 import 'package:app/providers/volume_provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dial/dial.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/svg.dart';
@@ -37,7 +38,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ConstantsProvider()),
         ChangeNotifierProvider(create: (_) => VolumeProvider()),
       ],
-      child: const MyApp(),    // ← here’s the missing child
+      child: const MyApp(), // ← here’s the missing child
     ),
   );
 }
@@ -77,13 +78,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<Widget> _carouselItems = [MusicPlayer(), carInfo()];
 
-
   @override
   void initState() {
     super.initState();
     serialReader = SerialReader();
     serialReader.readData();
-
   }
 
   @override
@@ -97,8 +96,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final Size screenSize = MediaQuery.of(context).size;
     final double containerWidth = screenSize.width / 3;
     final constants = context.watch<ConstantsProvider>().constants;
-    final vol = context.watch<VolumeProvider>().volume;  // 0.0–1.0
-    final perc = (vol*100).round();
+    final vol = context.watch<VolumeProvider>().volume; // 0.0–1.0
+    final perc = (vol * 100).round();
 
     // 0–100%
 
@@ -201,14 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
               ),
-              Positioned(
-                bottom: 40,
-                right: 35,
-                child: VolumeControl(),
-
-              ),
-
-
+              Positioned(bottom: 40, right: 35, child: VolumeControl()),
 
               Positioned(
                 top: 5,
@@ -478,84 +470,62 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               Positioned(
-                left: screenSize.width / 3,
+                left: screenSize.width/3,
+                right: 0,
                 bottom: 0,
                 child: ClipRect(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
                     child: Container(
-                      width: screenSize.width * 2 / 3,
                       height: 50,
                       color: constants.primaryColor,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
+                        spacing: 80,
                         children: [
-                          SvgPicture.asset(
-                            color: constants.iconColor,
-                            width: constants.iconSize / 1.5,
-                            height: constants.iconSize / 1.5,
-                            'assets/icons/car.svg',
+                          Text(
+                            "0C",
+                            style: TextStyle(
+                              fontSize: constants.fontSize,
+                              color: constants.fontColor,
+                            ),
                           ),
-                          // Padding(
-                          //   padding: const EdgeInsets.only(left: 10, right: 5),
-                          //   child: Text(
-                          //     //"${(data['temp2'] ?? 0).toStringAsFixed(0)}°C",
-                          //     style: TextStyle(
-                          //       fontSize: constants.fontSize,
-                          //       color: constants.fontColor,
-                          //     ),
-                          //   ),
-                          // ),
+                          SizedBox(width: 10),
                           IconButton(
                             onPressed: null,
                             icon: SvgPicture.asset(
-                              width: constants.iconSize * 1.3,
-                              height: constants.iconSize * 1.3,
                               'assets/icons/fan-off.svg',
-                              color: constants.iconColor,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: null,
-                            icon: SvgPicture.asset(
                               width: constants.iconSize * 1.3,
                               height: constants.iconSize * 1.3,
-                              'assets/icons/knob.svg',
                               color: constants.iconColor,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 1),
-                            child: Text(
-                              style: TextStyle(
-                                fontSize: constants.fontSize,
-                                color: constants.iconColor,
-                              ),
-                              "30%",
+                          Text(
+                            "30%",
+                            style: TextStyle(
+                              fontSize: constants.fontSize,
+                              color: constants.iconColor,
                             ),
                           ),
                           Spacer(),
-                          const SizedBox(width: 60),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 20),
-                            child: IconButton(
-                              onPressed: () {
-                                // toggle between mute and full volume
-                                if (vol == 0) {
-                                  context.read<VolumeProvider>().volume = 1.0;
-                                } else {
-                                  context.read<VolumeProvider>().volume = 0.0;
-                                }
-                              },
-                              icon: SvgPicture.asset(
-                                vol <= 0
-                                    ? 'assets/material3icons/volume_off.svg'
-                                    : vol < 0.5
-                                    ? 'assets/material3icons/volume_down.svg'
-                                    : 'assets/material3icons/volume_up.svg',
-                                width: constants.iconSize * 1.3,
-                                height: constants.iconSize * 1.3,
-                                color: constants.iconColor,
-                              ),
+                          IconButton(
+                            onPressed: () {
+                              print(context.read<VolumeProvider>().volume);
+                              if (vol == 0) {
+                                context.read<VolumeProvider>().volume = 1.0;
+                              } else {
+                                context.read<VolumeProvider>().volume = 0.0;
+                              }
+                            },
+                            icon: SvgPicture.asset(
+                              vol <= 0
+                                  ? 'assets/material3icons/volume_off.svg'
+                                  : vol < 0.5
+                                  ? 'assets/material3icons/volume_down.svg'
+                                  : 'assets/material3icons/volume_up.svg',
+                              width: constants.iconSize * 1.3,
+                              height: constants.iconSize * 1.3,
+                              color: constants.iconColor,
                             ),
                           ),
                         ],
