@@ -5,23 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5d266d3d-6e3e-4bc1-bdf7-00d337f65378" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/assets/material3icons/location-off.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/assets/material3icons/location-on.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/assets/material3icons/question-mark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/lib/providers/serial_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/assets/material3icons/car-gear.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/lib/pages/settings.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/lib/esp32-data-reciever.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/lib/info_tab.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/lib/info_tab.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/lib/pages/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/lib/providers/constants-provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/lib/providers/constants-provider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/lib/providers/volume_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/lib/providers/volume_provider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/lib/services.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/lib/services/services.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/lib/theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/lib/services/theme.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/lib/volume_slider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/lib/volume_slider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/app/linux/flutter/generated_plugins.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/app/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/app/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +24,13 @@
   </component>
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dart File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -76,10 +77,15 @@
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\projects\carpi\app\assets\material3icons" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\projects\carpi\app\assets\material3icons" />
+      <recent name="E:\projects\carpi\app\lib\pages" />
+      <recent name="E:\projects\carpi\app\lib\services" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="main" type="FlutterRunConfigurationType" factoryName="Flutter">
-      <option name="filePath" value="$PROJECT_DIR$/app/lib/main.dart" />
+      <option name="filePath" value="$PROJECT_DIR$/app/lib/pages/main.dart" />
       <method v="2" />
     </configuration>
   </component>

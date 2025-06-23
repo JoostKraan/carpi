@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:app/clock.dart';
 import 'package:app/music_player.dart';
+import 'package:app/pages/settings.dart';
 import 'package:app/providers/constants-provider.dart';
 import 'package:app/providers/serial_provider.dart';
 import 'package:app/providers/volume_provider.dart';
@@ -10,11 +11,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:app/services.dart';
+import 'package:app/services/services.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'package:provider/provider.dart';
-import 'info_tab.dart';
-import 'volume_slider.dart';
+import '../info_tab.dart';
+import '../volume_slider.dart';
 
 Services services = Services();
 
@@ -47,6 +48,7 @@ void initialize() {
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({super.key});
 
   @override
@@ -72,6 +74,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool showSettings = false;
   int _currentIndex = 0;
   final List<Widget> _carouselItems = [MusicPlayer(), carInfo()];
 
@@ -80,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final Size screenSize = MediaQuery.of(context).size;
     final double containerWidth = screenSize.width / 3;
     final constants = context.watch<ConstantsProvider>().constants;
-    final vol = context.watch<VolumeProvider>().volume;
+    final volume = context.watch<VolumeProvider>().volume;
     final temp1 = context.watch<SerialReaderProvider>().temp1;
     final temp2 = context.watch<SerialReaderProvider>().temp2;
     final lat = context.watch<SerialReaderProvider>().lat;
@@ -94,12 +97,8 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Positioned.fill(
+          Positioned(
             child: FlutterMap(
-              options: MapOptions(
-                initialCenter: const LatLng(1, 1),
-                initialZoom: 3.2,
-              ),
               children: [
                 TileLayer(
                   retinaMode: true,
@@ -108,9 +107,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 MarkerLayer(
                   markers: [
-                    if(hasGps)
+                    if (hasGps)
                       Marker(
-                        point: LatLng(lat,lon),
+                        point: LatLng(lat, lon),
                         width: 50,
                         height: 50,
                         child: SvgPicture.asset(
@@ -147,8 +146,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: SvgPicture.asset(
-                    hasGps ?
-                    'assets/material3icons/location-on.svg' : 'assets/material3icons/location-off.svg' ,
+                    hasGps
+                        ? 'assets/material3icons/location-on.svg'
+                        : 'assets/material3icons/location-off.svg',
                     color: constants.iconColor,
                     width: constants.iconSize,
                     height: constants.iconSize,
@@ -193,23 +193,21 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Positioned(
-            top: 5,
+            top: 10,
             left: screenSize.width / 3 + 10,
             child: Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child:Text(
-                    "$temp1°C" ?? "!0°C",
-                    style: TextStyle(
-                      fontSize: constants.fontSize,
-                      color: constants.fontColor,
-                    ),
+                Text(
+                  "$temp1°C",
+                  style: TextStyle(
+                    fontSize: constants.fontSize,
+                    color: constants.fontColor,
                   ),
                 ),
               ],
             ),
           ),
+
           Positioned(
             top: 0,
             bottom: 0,
@@ -451,66 +449,89 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: constants.primaryColor,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    spacing: 60,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "$temp2°C" ?? "0°C",
-                        style: TextStyle(
-                          fontSize: constants.fontSize,
-                          color: constants.fontColor,
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      IconButton(
-                        onPressed: null,
-                        icon: SvgPicture.asset(
-                          'assets/icons/fan-off.svg',
-                          width: constants.iconSize * 1.3,
-                          height: constants.iconSize * 1.3,
-                          color: constants.iconColor,
-                        ),
-                      ),
-                      SvgPicture.asset(
-                        'assets/material3icons/question-mark.svg',
-                        width: constants.iconSize,
-                        height: constants.iconSize,
-                        color: constants.iconColor,
-                      ),
-                      SvgPicture.asset(
-                        'assets/material3icons/question-mark.svg',
-                        width: constants.iconSize,
-                        height: constants.iconSize,
-                        color: constants.iconColor,
-                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                showSettings = !showSettings;
+                              });
+                            },
+                            icon: SvgPicture.asset(
+                              width: constants.iconSize,
+                              height: constants.iconSize,
+                              color: constants.iconColor,
+                              'assets/material3icons/car-gear.svg',
+                            ),
+                          ),
+                          Text(
+                            "$temp2°C",
+                            style: TextStyle(
+                              fontSize: constants.fontSize,
+                              color: constants.fontColor,
+                            ),
+                          ),
 
-                      IconButton(
-                        onPressed: () {
-                          print(context.read<VolumeProvider>().volume);
-                          if (vol == 0) {
-                            context.read<VolumeProvider>().volume = 1.0;
-                          } else {
-                            context.read<VolumeProvider>().volume = 0.0;
-                          }
-                        },
-                        icon: SvgPicture.asset(
-                          vol <= 0
-                              ? 'assets/material3icons/volume_off.svg'
-                              : vol < 0.5
-                              ? 'assets/material3icons/volume_down.svg'
-                              : 'assets/material3icons/volume_up.svg',
-                          width: constants.iconSize,
-                          height: constants.iconSize,
-                          color: constants.iconColor,
-                        ),
+                          IconButton(
+                            onPressed: null,
+                            icon: SvgPicture.asset(
+                              'assets/icons/fan-off.svg',
+                              width: constants.iconSize * 1.3,
+                              height: constants.iconSize * 1.3,
+                              color: constants.iconColor,
+                            ),
+                          ),
+                          SvgPicture.asset(
+                            'assets/material3icons/question-mark.svg',
+                            width: constants.iconSize,
+                            height: constants.iconSize,
+                            color: constants.iconColor,
+                          ),
+                          SvgPicture.asset(
+                            'assets/material3icons/question-mark.svg',
+                            width: constants.iconSize,
+                            height: constants.iconSize,
+                            color: constants.iconColor,
+                          ),
+                        ],
                       ),
-                      VolumeControl(),
+                      Row(
+                        children: [
+                       SvgPicture.asset(
+                              volume == 0.0
+                                  ? 'assets/material3icons/volume_off.svg'
+                                  : volume < 10
+                                  ? 'assets/material3icons/volume_down.svg'
+                                  : 'assets/material3icons/volume_up.svg',
+                              width: constants.iconSize,
+                              height: constants.iconSize,
+                              color: constants.iconColor,
+                            ),
+                          VolumeControl(),
+                        ],
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
           ),
+          Positioned(
+            bottom: 50,
+            left: screenSize.width / 3,
+            height: screenSize.height - 100,
+            width: screenSize.width,
+            child: Container(
+              width: 100,
+              height: 100,
+              child: showSettings ? Settings() : null,
+            ),
+          ),
+
+
+
         ],
       ),
     );

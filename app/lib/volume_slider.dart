@@ -1,4 +1,5 @@
 import 'package:app/providers/constants-provider.dart';
+import 'package:app/providers/volume_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:volume_controller/volume_controller.dart';
@@ -11,7 +12,7 @@ class VolumeControl extends StatefulWidget {
 }
 
 class _VolumeControlState extends State<VolumeControl> {
-  double _currentVolumeSlider = 10;  // 0–20 range
+  double _currentVolumeSlider = 10;
 
   @override
   void initState() {
@@ -23,12 +24,16 @@ class _VolumeControlState extends State<VolumeControl> {
       setState(() {
         _currentVolumeSlider = v * 20;
       });
+      print('Initial system volume: ${v * 20}');
     });
+
     // listen for external changes (buttons, etc):
     VolumeController.instance.addListener((v) {
+      final sliderValue = v * 20;
       setState(() {
-        _currentVolumeSlider = v * 20;
+        _currentVolumeSlider = sliderValue;
       });
+      print('Volume changed externally: $sliderValue');
     }, fetchInitialVolume: false);
   }
 
@@ -58,9 +63,10 @@ class _VolumeControlState extends State<VolumeControl> {
           inactiveColor: constants.primaryColor,
           onChanged: (v) {
             setState(() {
-              _currentVolumeSlider = v;
+              context.read<VolumeProvider>().volume = v;
             });
             final normalized = (v.clamp(0, 20)) / 20;
+            print('Volume changed via slider: $v (normalized: $normalized)');
             VolumeController.instance.setVolume(normalized);
           },
         ),
@@ -68,3 +74,4 @@ class _VolumeControlState extends State<VolumeControl> {
     );
   }
 }
+
