@@ -21,6 +21,10 @@ dependencies:
   flutter_fullscreen: ^1.2.0
   flutter_dotenv: ^5.2.1
   web_socket_channel: ^3.0.3
+  flutter_libserialport: ^0.5.0
+  carousel_slider: ^5.1.1
+  provider: ^6.1.5
+  volume_controller: ^3.4.0
 
 dev_dependencies:
   flutter_test:
@@ -33,6 +37,7 @@ flutter:
     - assets/icons/
     - assets/material3icons/
     - assets/.env
+    - assets/img/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

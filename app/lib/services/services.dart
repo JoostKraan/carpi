@@ -2,11 +2,7 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
 
-
-
-
 class Services{
-
   final ValueNotifier<bool> hasInternet = ValueNotifier(true);
   Future<void> checkForInternet() async {
     while(true){
@@ -15,7 +11,6 @@ class Services{
         final result = await InternetAddress.lookup('google.com');
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           hasInternet.value = true;
-          log('connected $hasInternet');
         }
       }
       on SocketException catch (_) {
@@ -25,7 +20,6 @@ class Services{
       }
     }
   }
-
   }
   
 
