@@ -17,7 +17,8 @@ class Constants{
 
   Constants(this.isDarkMode)
 
-      : primaryColor = isDarkMode ? const Color(0xBE1A1A1A) : const Color(0x83F6F6F4),
+      : primaryColor = isDarkMode ? const Color(0xBE1A1A1A) : const Color(
+      0xBFF6F6F4),
         secondaryColor = isDarkMode ? const Color(0xFF333333) : const Color(0xD19B9B9B),
         accentColor = const Color(0xFF0E79B2),
         errorColor = const Color(0xFFEF476F),

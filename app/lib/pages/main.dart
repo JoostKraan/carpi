@@ -1,6 +1,6 @@
 import 'dart:ui';
-import 'package:app/clock.dart';
-import 'package:app/music_player.dart';
+import 'package:app/widgets/clock.dart';
+import 'package:app/widgets/music_player.dart';
 import 'package:app/pages/settings.dart';
 import 'package:app/providers/constants-provider.dart';
 import 'package:app/providers/serial_provider.dart';
@@ -14,13 +14,15 @@ import 'package:latlong2/latlong.dart';
 import 'package:app/services/services.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'package:provider/provider.dart';
-import '../info_tab.dart';
-import '../volume_slider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/info_tab.dart';
+import '../widgets/volume_slider.dart';
 
 Services services = Services();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final constantsProvider = await ConstantsProvider.create();
   await dotenv.load(fileName: 'assets/.env');
   initialize();
 
@@ -34,23 +36,21 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ConstantsProvider()),
+        ChangeNotifierProvider(create: (_) => constantsProvider,),
         ChangeNotifierProvider(create: (_) => VolumeProvider()),
         ChangeNotifierProvider(create: (_) => SerialReaderProvider()),
       ],
-      child: const MyApp(), // ← here’s the missing child
+      child: const MyApp(),
     ),
   );
 }
 
-void initialize() {
+void initialize()  {
   services.checkForInternet();
 }
 
 class MyApp extends StatelessWidget {
-
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -68,12 +68,12 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final prefs = SharedPreferences.getInstance();
   bool showSettings = false;
   int _currentIndex = 0;
   final List<Widget> _carouselItems = [MusicPlayer(), carInfo()];
@@ -89,7 +89,6 @@ class _MyHomePageState extends State<MyHomePage> {
     final lat = context.watch<SerialReaderProvider>().lat;
     final lon = context.watch<SerialReaderProvider>().lon;
     final hasGps = context.watch<SerialReaderProvider>().hasLocation;
-    // 0–100%
 
     return Scaffold(
       backgroundColor: constants.primaryColor,
@@ -524,14 +523,9 @@ class _MyHomePageState extends State<MyHomePage> {
             height: screenSize.height - 100,
             width: screenSize.width,
             child: Container(
-              width: 100,
-              height: 100,
               child: showSettings ? Settings() : null,
             ),
           ),
-
-
-
         ],
       ),
     );

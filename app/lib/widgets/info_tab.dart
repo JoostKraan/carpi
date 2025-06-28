@@ -1,17 +1,20 @@
-import 'package:app/services/theme.dart';
+import 'package:app/providers/constants-provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 
 class carInfo extends StatefulWidget {
   const carInfo({super.key});
 
   @override
   State<carInfo> createState() => _carInfoState();
+
 }
 
 class _carInfoState extends State<carInfo> {
+  late final constants = context.watch<ConstantsProvider>().constants;
   @override
   Widget build(BuildContext context) {
-    final constants = Constants(true);
     final Size screenSize = MediaQuery.of(context).size;
     return Container(
       decoration: BoxDecoration(
