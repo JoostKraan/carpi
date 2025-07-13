@@ -195,9 +195,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       context.read<ConstantsProvider>().toggleDarkMode(),
                   icon: SvgPicture.asset(
                     color: constants.iconColor,
-                    'assets/icons/theme-light-dark.svg',
-                    width: constants.iconSize * 1.5,
-                    height: constants.iconSize * 1.5,
+                    context.read<ConstantsProvider>().isDarkMode ?  'assets/icons/dark-mode.svg' :
+                    'assets/icons/light-mode.svg',
+                    width: constants.iconSize * 1,
+                    height: constants.iconSize * 1,
                   ),
                 ),
               ],

@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_libserialport/flutter_libserialport.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SerialReaderProvider extends ChangeNotifier {
-  static const String portName = 'COM3';
+
+  static final String portName = dotenv.env['PORT_NAME']! ;
   final channel = WebSocketChannel.connect(
     Uri.parse('ws://192.168.1.69:8765'),
   );
@@ -26,6 +28,7 @@ class SerialReaderProvider extends ChangeNotifier {
 
   SerialReaderProvider() {
     esp32Port = SerialPort(portName);
+    print(portName);
     print("Initializing SerialReaderProvider");
     _startReading();
   }
