@@ -27,6 +27,11 @@ class SerialReaderProvider extends ChangeNotifier {
   String _buffer = '';
 
   SerialReaderProvider() {
+    final ports = SerialPort.availablePorts;
+    print('Available serial ports:');
+    for (final port in ports) {
+      print('➡️ $port');
+    }
     esp32Port = SerialPort(portName);
     print(portName);
     print("Initializing SerialReaderProvider");
