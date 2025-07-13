@@ -21,7 +21,6 @@ class _MusicPlayerState extends State<MusicPlayer> {
   bool isPlaying = false;
   List<String> availableCommands = [];
 
-  // Optimistic UI override for playing state
   bool? optimisticIsPlaying;
 
   @override
@@ -141,7 +140,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
           foregroundColor: constants.iconColor,
           onPressed: enabled ? onPressed : null,
           child: SvgPicture.asset(
-            'assets/material3icons/$icon',
+            'assets/icons/$icon',
             width: constants.iconSize,
             height: constants.iconSize,
             color: constants.iconColor,

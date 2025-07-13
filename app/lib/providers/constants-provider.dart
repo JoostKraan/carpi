@@ -7,7 +7,7 @@ class ConstantsProvider extends ChangeNotifier {
   late Constants _constants;
   late bool _isDarkMode;
 
-  ConstantsProvider._(); // private named constructor
+  ConstantsProvider._();
 
   static Future<ConstantsProvider> create() async {
     final provider = ConstantsProvider._();

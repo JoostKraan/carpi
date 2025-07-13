@@ -36,7 +36,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => constantsProvider,),
+        ChangeNotifierProvider(create: (_) => constantsProvider),
         ChangeNotifierProvider(create: (_) => VolumeProvider()),
         ChangeNotifierProvider(create: (_) => SerialReaderProvider()),
       ],
@@ -45,7 +45,7 @@ void main() async {
   );
 }
 
-void initialize()  {
+void initialize() {
   services.checkForInternet();
 }
 
@@ -128,13 +128,25 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
+                  child: IconButton(
+                    onPressed: null,
+                    icon: SvgPicture.asset(
+                      'assets/icons/phone.svg',
+                      color: constants.iconColor,
+                      width: constants.iconSize,
+                      height: constants.iconSize,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
                   child: ValueListenableBuilder(
                     valueListenable: services.hasInternet,
                     builder: (context, hasInternet, child) {
                       return SvgPicture.asset(
                         hasInternet
-                            ? 'assets/material3icons/wifi.svg'
-                            : 'assets/material3icons/wifi-off.svg',
+                            ? 'assets/icons/wifi.svg'
+                            : 'assets/icons/wifi-off.svg',
                         color: constants.iconColor,
                         width: constants.iconSize,
                         height: constants.iconSize,
@@ -146,8 +158,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: const EdgeInsets.only(right: 10),
                   child: SvgPicture.asset(
                     hasGps
-                        ? 'assets/material3icons/location-on.svg'
-                        : 'assets/material3icons/location-off.svg',
+                        ? 'assets/icons/location-on.svg'
+                        : 'assets/icons/location-off.svg',
                     color: constants.iconColor,
                     width: constants.iconSize,
                     height: constants.iconSize,
@@ -157,14 +169,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: SvgPicture.asset(
-                    'assets/material3icons/bluetooth-disabled.svg',
+                    'assets/icons/bluetooth-disabled.svg',
                     color: constants.iconColor,
                     width: constants.iconSize,
                     height: constants.iconSize,
                   ),
                 ),
                 SvgPicture.asset(
-                  'assets/material3icons/signal-cellular-off.svg',
+                  'assets/icons/signal-cellular-off.svg',
                   color: constants.iconColor,
                   width: constants.iconSize,
                   height: constants.iconSize,
@@ -462,7 +474,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               width: constants.iconSize,
                               height: constants.iconSize,
                               color: constants.iconColor,
-                              'assets/material3icons/car-gear.svg',
+                              'assets/icons/car-gear.svg',
                             ),
                           ),
                           Text(
@@ -472,42 +484,20 @@ class _MyHomePageState extends State<MyHomePage> {
                               color: constants.fontColor,
                             ),
                           ),
-
-                          IconButton(
-                            onPressed: null,
-                            icon: SvgPicture.asset(
-                              'assets/icons/fan-off.svg',
-                              width: constants.iconSize * 1.3,
-                              height: constants.iconSize * 1.3,
-                              color: constants.iconColor,
-                            ),
-                          ),
-                          SvgPicture.asset(
-                            'assets/material3icons/question-mark.svg',
-                            width: constants.iconSize,
-                            height: constants.iconSize,
-                            color: constants.iconColor,
-                          ),
-                          SvgPicture.asset(
-                            'assets/material3icons/question-mark.svg',
-                            width: constants.iconSize,
-                            height: constants.iconSize,
-                            color: constants.iconColor,
-                          ),
                         ],
                       ),
                       Row(
                         children: [
-                       SvgPicture.asset(
-                              volume == 0.0
-                                  ? 'assets/material3icons/volume_off.svg'
-                                  : volume < 10
-                                  ? 'assets/material3icons/volume_down.svg'
-                                  : 'assets/material3icons/volume_up.svg',
-                              width: constants.iconSize,
-                              height: constants.iconSize,
-                              color: constants.iconColor,
-                            ),
+                          SvgPicture.asset(
+                            volume == 0.0
+                                ? 'assets/icons/volume_off.svg'
+                                : volume < 10
+                                ? 'assets/icons/volume_down.svg'
+                                : 'assets/icons/volume_up.svg',
+                            width: constants.iconSize,
+                            height: constants.iconSize,
+                            color: constants.iconColor,
+                          ),
                           VolumeControl(),
                         ],
                       ),
@@ -522,9 +512,7 @@ class _MyHomePageState extends State<MyHomePage> {
             left: screenSize.width / 3,
             height: screenSize.height - 100,
             width: screenSize.width,
-            child: Container(
-              child: showSettings ? Settings() : null,
-            ),
+            child: Container(child: showSettings ? Settings() : null),
           ),
         ],
       ),

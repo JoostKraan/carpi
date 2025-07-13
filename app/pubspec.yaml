@@ -26,6 +26,8 @@ dependencies:
   provider: ^6.1.5
   volume_controller: ^3.4.0
   shared_preferences: ^2.5.3
+  socket_io_client: ^3.1.2
+  process_run: ^1.2.4
 
 dev_dependencies:
   flutter_test:
@@ -36,7 +38,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/icons/
-    - assets/material3icons/
+    - assets/icons/
     - assets/.env
     - assets/img/
 
