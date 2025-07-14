@@ -10,7 +10,6 @@ class SerialReaderProvider extends ChangeNotifier {
   final channel = WebSocketChannel.connect(
     Uri.parse('ws://192.168.1.69:8765'),
   );
-
   late final SerialPort esp32Port;
   SerialPortReader? reader;
 
@@ -23,15 +22,9 @@ class SerialReaderProvider extends ChangeNotifier {
   final StreamController<String> _dataController = StreamController<String>.broadcast();
   Stream<String> get dataStream => _dataController.stream;
 
-  // Buffer for incomplete data
   String _buffer = '';
 
   SerialReaderProvider() {
-    final ports = SerialPort.availablePorts;
-    print('Available serial ports:');
-    for (final port in ports) {
-      print('➡️ $port');
-    }
     esp32Port = SerialPort(portName);
     print(portName);
     print("Initializing SerialReaderProvider");
@@ -49,7 +42,7 @@ class SerialReaderProvider extends ChangeNotifier {
       esp32Port.config = config;
 
       if (!esp32Port.openReadWrite()) {
-        print('❌ Failed to open serial port: ${SerialPort.lastError}');
+        print('Failed to open serial port: ${SerialPort.lastError}');
         return;
       }
 
@@ -57,11 +50,9 @@ class SerialReaderProvider extends ChangeNotifier {
 
       reader!.stream.listen(
             (data) {
-          // Convert bytes to string and add to buffer
           final chunk = String.fromCharCodes(data);
           _buffer += chunk;
 
-          // Process complete lines
           while (_buffer.contains('\n')) {
             final lineEnd = _buffer.indexOf('\n');
             final line = _buffer.substring(0, lineEnd).trim();
@@ -73,12 +64,14 @@ class SerialReaderProvider extends ChangeNotifier {
           }
         },
         onError: (error) {
-          print('❌ Serial read error: $error');
+          print('Serial read error: $error');
           _dataController.addError(error);
         },
       );
+      print("Subscribed to serial stream");
+
     } catch (e) {
-      print('❌ Exception while opening/reading serial port: $e');
+      print('Exception while opening/reading serial port: $e');
       _dataController.addError(e);
     }
   }
@@ -125,7 +118,7 @@ class SerialReaderProvider extends ChangeNotifier {
       _dataController.close();
       super.dispose();
     } catch (e) {
-      print('❌ Exception during dispose: $e');
+      print('Exception during dispose: $e');
     }
   }
 }
