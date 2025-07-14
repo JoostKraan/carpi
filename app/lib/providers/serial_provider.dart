@@ -42,10 +42,8 @@ class SerialReaderProvider extends ChangeNotifier {
     }
 
     final config = SerialPortConfig()
-      ..baudRate = 115200
-      ..bits = 8
-      ..parity = SerialPortParity.none
-      ..stopBits = 1;
+      ..baudRate = 115200;
+    
 
     esp32Port.config = config;  
 
