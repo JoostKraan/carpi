@@ -43,15 +43,6 @@ class SerialReaderProvider extends ChangeNotifier {
 
     esp32Port = SerialPort(portName);
 
-    try {
-      // Set config FIRST
-
-    } catch (e, stack) {
-      print('⚠️ Failed to set SerialPort config: $e');
-      print('Stack trace:\n$stack');
-      return;
-    }
-
     Future.delayed(const Duration(seconds: 2), () {
       _startReading();
     });
@@ -59,12 +50,8 @@ class SerialReaderProvider extends ChangeNotifier {
 
   void _startReading() {
     try {
-      // ✅ Step 1: Create and set config BEFORE opening
-      final config = SerialPortConfig()
-        ..baudRate = 115200;
-      esp32Port.config = config;
-
-      // ✅ Step 2: Open the port
+      // ✅ Method 1: Open first, then configure
+      print('🔧 Opening serial port...');
       if (!esp32Port.openReadWrite()) {
         print('❌ Failed to open serial port: ${SerialPort.lastError}');
         return;
@@ -72,7 +59,50 @@ class SerialReaderProvider extends ChangeNotifier {
 
       print('✅ Serial port opened: ${esp32Port.name}');
 
-      // ✅ Step 3: Set up the reader
+      // ✅ Now set the configuration AFTER opening
+      final config = SerialPortConfig()
+        ..baudRate = 115200
+        ..bits = 8
+        ..parity = SerialPortParity.none
+        ..stopBits = 1
+        ..rts = SerialPortRts.flowControl
+        ..cts = SerialPortCts.flowControl
+        ..dsr = SerialPortDsr.flowControl
+        ..dtr = SerialPortDtr.flowControl
+        ..setFlowControl(SerialPortFlowControl.none);
+
+      try {
+        esp32Port.config = config;
+        print('✅ Serial port configuration set successfully');
+      } catch (configError) {
+        print('⚠️ Failed to set full config, trying minimal config: $configError');
+
+        // Fallback: Try minimal configuration
+        try {
+          final minimalConfig = SerialPortConfig()
+            ..baudRate = 115200;
+          esp32Port.config = minimalConfig;
+          print('✅ Minimal configuration set successfully');
+        } catch (minimalError) {
+          print('❌ Even minimal config failed: $minimalError');
+          // Continue anyway - some systems work with default config
+        }
+      }
+
+      // ✅ Give the port a moment to stabilize
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _setupReader();
+      });
+
+    } catch (e, stackTrace) {
+      print('❌ Exception during _startReading: $e');
+      print('Stack trace:\n$stackTrace');
+    }
+  }
+
+  void _setupReader() {
+    try {
+      // ✅ Set up the reader
       reader = SerialPortReader(esp32Port);
       reader!.stream.listen(
             (Uint8List data) {
@@ -92,14 +122,14 @@ class SerialReaderProvider extends ChangeNotifier {
         },
         onDone: () => print('ℹ️ Serial reader closed'),
       );
+
+      isReading = true;
+      print('✅ Serial reader started successfully');
     } catch (e, stackTrace) {
-      print('❌ Exception during _startReading: $e');
+      print('❌ Exception during _setupReader: $e');
       print('Stack trace:\n$stackTrace');
     }
   }
-
-
-
 
   void _processLine(String line) {
     print('📥 Line received: $line');
@@ -134,6 +164,7 @@ class SerialReaderProvider extends ChangeNotifier {
   void dispose() {
     try {
       isReading = false;
+      reader?.close();
       esp32Port.close();
       esp32Port.dispose();
       _dataController.close();
