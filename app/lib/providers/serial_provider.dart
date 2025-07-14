@@ -36,12 +36,18 @@ class SerialReaderProvider extends ChangeNotifier {
     });
   }
   void _startReading() {
+    if (!esp32Port.openRead()) {
+      print('Failed to open: ${SerialPort.lastError}');
+      return;
+    }
+
     final config = SerialPortConfig()
       ..baudRate = 115200
       ..bits = 8
       ..parity = SerialPortParity.none
       ..stopBits = 1;
-    esp32Port.config = config;
+
+    esp32Port.config = config;  
 
     if (!esp32Port.openRead()) {
       print('Failed to open: ${SerialPort.lastError}');
