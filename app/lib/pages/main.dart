@@ -33,12 +33,14 @@ void main() async {
     FullScreen.setFullScreen(false);
   }
 
+
+  final serialProvider = SerialReaderProvider();
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => constantsProvider),
         ChangeNotifierProvider(create: (_) => VolumeProvider()),
-        ChangeNotifierProvider(create: (_) => SerialReaderProvider()),
+        ChangeNotifierProvider.value(value: serialProvider),
       ],
       child: const MyApp(),
     ),

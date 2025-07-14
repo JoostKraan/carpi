@@ -28,6 +28,7 @@ dependencies:
   shared_preferences: ^2.5.3
   socket_io_client: ^3.1.2
   process_run: ^1.2.4
+  libserialport_plus: ^0.0.9
 
 dev_dependencies:
   flutter_test:

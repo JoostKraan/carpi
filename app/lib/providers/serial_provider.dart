@@ -5,8 +5,12 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SerialReaderProvider extends ChangeNotifier {
-  static final String portName = dotenv.env["PORT_NAME"]!;
-  final channel = WebSocketChannel.connect(Uri.parse('ws://192.168.1.69:8765'));
+
+  static final String portName = dotenv.env['PORT_NAME']! ;
+  final channel = WebSocketChannel.connect(
+    Uri.parse('ws://192.168.1.69:8765'),
+  );
+
   late final SerialPort esp32Port;
   SerialPortReader? reader;
 
@@ -16,19 +20,15 @@ class SerialReaderProvider extends ChangeNotifier {
   double lon = 0.0;
   bool hasLocation = false;
 
-  final StreamController<String> _dataController =
-      StreamController<String>.broadcast();
+  final StreamController<String> _dataController = StreamController<String>.broadcast();
   Stream<String> get dataStream => _dataController.stream;
 
+  // Buffer for incomplete data
   String _buffer = '';
 
   SerialReaderProvider() {
     esp32Port = SerialPort(portName);
     print(portName);
-    final ports = SerialPort.availablePorts;
-    for (final port in ports) {
-      print('➡️ $port');
-    }
     print("Initializing SerialReaderProvider");
     _startReading();
   }
@@ -41,19 +41,18 @@ class SerialReaderProvider extends ChangeNotifier {
 
       final config = esp32Port.config;
       config.baudRate = 115200;
-      config.bits = 8; // Uncomment if supported
-      config.stopBits = 1; // Uncomment if supported
-      config.parity = SerialPortParity.none; // Uncomment if supported
       esp32Port.config = config;
 
-      if (!esp32Port.openRead()) {
-        print('❌ Failed to open serial port: ${SerialPort.lastError}');
+      if (!esp32Port.openReadWrite()) {
+        print('Failed to open serial port: ${SerialPort.lastError}');
         return;
       }
 
       reader = SerialPortReader(esp32Port);
+
       reader!.stream.listen(
-        (data) {
+            (data) {
+
           final chunk = String.fromCharCodes(data);
           _buffer += chunk;
 
@@ -68,14 +67,12 @@ class SerialReaderProvider extends ChangeNotifier {
           }
         },
         onError: (error) {
-          print('❌ Serial read error: $error');
+          print('Serial read error: $error');
           _dataController.addError(error);
         },
       );
-
-      print('✅ Subscribed to serial stream');
     } catch (e) {
-      print('❌ Exception while opening/reading serial port: $e');
+      print('Exception while opening/reading serial port: $e');
       _dataController.addError(e);
     }
   }
@@ -101,6 +98,7 @@ class SerialReaderProvider extends ChangeNotifier {
       }
       temp1 = (double.tryParse(parts[4])?.toInt() ?? 0).toString();
       temp2 = (double.tryParse(parts[5])?.toInt() ?? 0).toString();
+
 
       notifyListeners();
     } else {
