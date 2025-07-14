@@ -35,40 +35,51 @@ class SerialReaderProvider extends ChangeNotifier {
       _startReading();
     });
   }
-  void _startReading() {
-    if (!esp32Port.openRead()) {
-      print('Failed to open: ${SerialPort.lastError}');
-      return;
-    }
-
+  void _startReading() async {
     final config = SerialPortConfig()
       ..baudRate = 115200;
-    
 
-    esp32Port.config = config;  
 
-    if (!esp32Port.openRead()) {
-      print('Failed to open: ${SerialPort.lastError}');
-      return;
-    }
-    reader = SerialPortReader(esp32Port);
-    reader?.stream.listen(
-          (Uint8List data) {
-        final chunk = utf8.decode(data, allowMalformed: true);
-        _buffer += chunk;
+    while (true) {
+      try {
+        esp32Port.config = config;
 
-        while (_buffer.contains('\n')) {
-          final idx = _buffer.indexOf('\n');
-          final line = _buffer.substring(0, idx).trim();
-          _buffer = _buffer.substring(idx + 1);
-          if (line.isNotEmpty) _processLine(line);
+        if (!esp32Port.openRead()) {
+          print('Failed to open: ${SerialPort.lastError}');
+          print('Retrying to open the port in 10 seconds...');
+          await Future.delayed(const Duration(seconds: 10));
+          continue; // retry after delay
         }
-      },
-      onError: (e) => print('Serial read error: $e'),
-      onDone: () => print('Serial reader closed'),
-    );
 
+        print('Serial port opened successfully');
+
+        reader = SerialPortReader(esp32Port);
+        reader?.stream.listen(
+              (Uint8List data) {
+            final chunk = utf8.decode(data, allowMalformed: true);
+            _buffer += chunk;
+
+            while (_buffer.contains('\n')) {
+              final idx = _buffer.indexOf('\n');
+              final line = _buffer.substring(0, idx).trim();
+              _buffer = _buffer.substring(idx + 1);
+              if (line.isNotEmpty) _processLine(line);
+            }
+          },
+          onError: (e) => print('Serial read error: $e'),
+          onDone: () => print('Serial reader closed'),
+        );
+
+        break; // exit loop if opened successfully
+
+      } catch (e) {
+        print('Exception while opening port: $e');
+        print('Retrying in 10 seconds...');
+        await Future.delayed(const Duration(seconds: 10));
+      }
+    }
   }
+
 
   void _processLine(String line) {
     print('Processing line: $line');
