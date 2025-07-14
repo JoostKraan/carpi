@@ -30,6 +30,7 @@ dependencies:
   process_run: ^1.2.4
   libserialport_plus: ^0.0.9
   linux_serial: ^0.2.3+6
+  libserialport: ^0.3.0+1
 
 dev_dependencies:
   flutter_test:

@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_libserialport/flutter_libserialport.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:libserialport/libserialport.dart';
 
 class SerialReaderProvider extends ChangeNotifier {
   static final String portName = dotenv.env['PORT_NAME']!;
@@ -12,6 +13,7 @@ class SerialReaderProvider extends ChangeNotifier {
 
   late final SerialPort esp32Port;
   SerialPortReader? reader;
+  bool isReading = false;
 
   String temp1 = '';
   String temp2 = '';
@@ -25,64 +27,49 @@ class SerialReaderProvider extends ChangeNotifier {
   String _buffer = '';
 
   SerialReaderProvider() {
+    print("Initializing SerialReaderProvider with port: $portName");
+
     esp32Port = SerialPort(portName);
-    print(portName);
-    print("Initializing SerialReaderProvider");
 
     Future.delayed(const Duration(seconds: 2), () {
       _startReading();
     });
   }
-
   void _startReading() {
-    try {
-      if (esp32Port.isOpen) {
-        esp32Port.close();
-      }
+    final config = SerialPortConfig()
+      ..baudRate = 115200
+      ..bits = 8
+      ..parity = SerialPortParity.none
+      ..stopBits = 1;
+    esp32Port.config = config;
 
-      final config = esp32Port.config;
-      config.baudRate = 115200;
-      config.bits = 8;
-      config.stopBits = 1;
-      config.parity = SerialPortParity.none;
-      esp32Port.config = config;
-
-      if (!esp32Port.openRead()) {
-        print('Failed to open serial port: ${SerialPort.lastError}');
-        return;
-      }
-
-      reader = SerialPortReader(esp32Port);
-
-      reader!.stream.listen(
-            (data) {
-          final chunk = String.fromCharCodes(data);
-          _buffer += chunk;
-
-          while (_buffer.contains('\n')) {
-            final lineEnd = _buffer.indexOf('\n');
-            final line = _buffer.substring(0, lineEnd).trim();
-            _buffer = _buffer.substring(lineEnd + 1);
-
-            if (line.isNotEmpty) {
-              _processLine(line);
-            }
-          }
-        },
-        onError: (error) {
-          print('Serial read error: $error');
-          _dataController.addError(error);
-        },
-      );
-    } catch (e) {
-      print('Exception while opening/reading serial port: $e');
-      _dataController.addError(e);
+    if (!esp32Port.openRead()) {
+      print('Failed to open: ${SerialPort.lastError}');
+      return;
     }
+    reader = SerialPortReader(esp32Port);
+    reader?.stream.listen(
+          (Uint8List data) {
+        final chunk = utf8.decode(data, allowMalformed: true);
+        _buffer += chunk;
+
+        while (_buffer.contains('\n')) {
+          final idx = _buffer.indexOf('\n');
+          final line = _buffer.substring(0, idx).trim();
+          _buffer = _buffer.substring(idx + 1);
+          if (line.isNotEmpty) _processLine(line);
+        }
+      },
+      onError: (e) => print('Serial read error: $e'),
+      onDone: () => print('Serial reader closed'),
+    );
+
   }
 
   void _processLine(String line) {
     print('Processing line: $line');
     channel.sink.add(line);
+    _dataController.add(line);
 
     final parts = line.split(',');
 
@@ -101,22 +88,17 @@ class SerialReaderProvider extends ChangeNotifier {
       }
       temp1 = (double.tryParse(parts[4])?.toInt() ?? 0).toString();
       temp2 = (double.tryParse(parts[5])?.toInt() ?? 0).toString();
-
       notifyListeners();
     } else {
       print('Invalid data format: expected 6 parts, got ${parts.length}');
     }
-
-    _dataController.add(line);
   }
 
   @override
   void dispose() {
     try {
-      reader?.close();
-      if (esp32Port.isOpen) {
-        esp32Port.close();
-      }
+      isReading = false;
+      esp32Port.close();
       esp32Port.dispose();
       _dataController.close();
       super.dispose();
