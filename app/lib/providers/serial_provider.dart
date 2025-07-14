@@ -29,7 +29,6 @@ class SerialReaderProvider extends ChangeNotifier {
     print(portName);
     print("Initializing SerialReaderProvider");
 
-    // Delay before reading serial port
     Future.delayed(const Duration(seconds: 2), () {
       _startReading();
     });
@@ -48,7 +47,7 @@ class SerialReaderProvider extends ChangeNotifier {
       config.parity = SerialPortParity.none;
       esp32Port.config = config;
 
-      if (!esp32Port.openReadWrite()) {
+      if (!esp32Port.openRead()) {
         print('Failed to open serial port: ${SerialPort.lastError}');
         return;
       }
