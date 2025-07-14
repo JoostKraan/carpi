@@ -140,6 +140,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
           foregroundColor: constants.iconColor,
           onPressed: enabled ? onPressed : null,
           child: SvgPicture.asset(
+
             'assets/icons/$icon',
             width: constants.iconSize,
             height: constants.iconSize,
