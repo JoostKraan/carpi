@@ -42,16 +42,14 @@ class SerialReaderProvider extends ChangeNotifier {
         return;
       }
 
-      final config = SerialPortConfig()
-        ..baudRate = 115200;
-
-
+      final config = SerialPortConfig()..baudRate = 115200;
       esp32Port.config = config;
 
       if (!esp32Port.openRead()) {
         print('Failed to open: ${SerialPort.lastError}');
         return;
       }
+
       reader = SerialPortReader(esp32Port);
       reader!.stream.listen(
             (Uint8List data) {
@@ -65,17 +63,18 @@ class SerialReaderProvider extends ChangeNotifier {
             if (line.isNotEmpty) _processLine(line);
           }
         },
-        onError: (e) => print('Serial read error: $e'),
+        onError: (e, stackTrace) {
+          print('Serial read error: $e');
+          print('Stack trace:\n$stackTrace');
+        },
         onDone: () => print('Serial reader closed'),
       );
-
+    } catch (e, stackTrace) {
+      print('Exception: $e');
+      print('Stack trace:\n$stackTrace');
     }
-    catch(e){
-      print(e);
-    }
-
-
   }
+
 
   void _processLine(String line) {
     print('Processing line: $line');
