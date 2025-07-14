@@ -46,7 +46,7 @@ class SerialReaderProvider extends ChangeNotifier {
       config.parity = SerialPortParity.none; // Uncomment if supported
       esp32Port.config = config;
 
-      if (!esp32Port.openReadWrite()) {
+      if (!esp32Port.openRead()) {
         print('❌ Failed to open serial port: ${SerialPort.lastError}');
         return;
       }
