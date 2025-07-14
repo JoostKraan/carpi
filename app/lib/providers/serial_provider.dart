@@ -59,18 +59,18 @@ class SerialReaderProvider extends ChangeNotifier {
 
   void _startReading() {
     try {
-      // ✅ Step 1: Open the port first
+      // ✅ Step 1: Create and set config BEFORE opening
+      final config = SerialPortConfig()
+        ..baudRate = 115200;
+      esp32Port.config = config;
+
+      // ✅ Step 2: Open the port
       if (!esp32Port.openReadWrite()) {
         print('❌ Failed to open serial port: ${SerialPort.lastError}');
         return;
       }
 
       print('✅ Serial port opened: ${esp32Port.name}');
-
-      // ✅ Step 2: Now set the config
-      final config = SerialPortConfig()
-        ..baudRate = 115200;
-      esp32Port.config = config;
 
       // ✅ Step 3: Set up the reader
       reader = SerialPortReader(esp32Port);
@@ -97,6 +97,7 @@ class SerialReaderProvider extends ChangeNotifier {
       print('Stack trace:\n$stackTrace');
     }
   }
+
 
 
 
