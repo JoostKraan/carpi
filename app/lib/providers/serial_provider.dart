@@ -39,19 +39,21 @@ class SerialReaderProvider extends ChangeNotifier {
     final config = SerialPortConfig()
       ..baudRate = 115200;
 
-
     while (true) {
       try {
-        esp32Port.config = config;
+        print('Trying to open port: $portName');
 
         if (!esp32Port.openRead()) {
-          print('Failed to open: ${SerialPort.lastError}');
+          print('Failed to open port: ${SerialPort.lastError}');
           print('Retrying to open the port in 10 seconds...');
           await Future.delayed(const Duration(seconds: 10));
-          continue; // retry after delay
+          continue;
         }
 
-        print('Serial port opened successfully');
+        print('Port opened successfully');
+
+        esp32Port.config = config;
+        print('Port configured');
 
         reader = SerialPortReader(esp32Port);
         reader?.stream.listen(
@@ -70,15 +72,16 @@ class SerialReaderProvider extends ChangeNotifier {
           onDone: () => print('Serial reader closed'),
         );
 
-        break; // exit loop if opened successfully
+        break; // exit retry loop on success
 
       } catch (e) {
-        print('Exception while opening port: $e');
+        print('Exception while opening/configuring port: $e');
         print('Retrying in 10 seconds...');
         await Future.delayed(const Duration(seconds: 10));
       }
     }
   }
+
 
 
   void _processLine(String line) {
