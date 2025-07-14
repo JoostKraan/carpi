@@ -29,21 +29,44 @@ class SerialReaderProvider extends ChangeNotifier {
   SerialReaderProvider() {
     print("Initializing SerialReaderProvider with port: $portName");
 
+    // Debug list of ports
+    final ports = SerialPort.availablePorts;
+    print("Available ports: ${ports.isEmpty ? '(none)' : ''}");
+    for (final p in ports) {
+      print(" - $p");
+    }
+
+    if (!ports.contains(portName)) {
+      print("⚠️ ERROR: Port '$portName' not found in available ports.");
+      return;
+    }
+
     esp32Port = SerialPort(portName);
+
+    try {
+      // Set config FIRST
+      final config = SerialPortConfig()
+        ..baudRate = 115200;
+      esp32Port.config = config;
+    } catch (e, stack) {
+      print('⚠️ Failed to set SerialPort config: $e');
+      print('Stack trace:\n$stack');
+      return;
+    }
 
     Future.delayed(const Duration(seconds: 2), () {
       _startReading();
     });
   }
+
   void _startReading() {
     try {
-      final config = SerialPortConfig()..baudRate = 115200;
-      esp32Port.config = config;  // ✅ Set config BEFORE opening the port
-
       if (!esp32Port.openRead()) {
-        print('Failed to open: ${SerialPort.lastError}');
+        print('❌ Failed to open serial port: ${SerialPort.lastError}');
         return;
       }
+
+      print('✅ Serial port opened: ${esp32Port.name}');
 
       reader = SerialPortReader(esp32Port);
       reader!.stream.listen(
@@ -65,23 +88,21 @@ class SerialReaderProvider extends ChangeNotifier {
         onDone: () => print('Serial reader closed'),
       );
     } catch (e, stackTrace) {
-      print('Exception: $e');
+      print('❌ Exception during _startReading: $e');
       print('Stack trace:\n$stackTrace');
     }
   }
 
-
-
   void _processLine(String line) {
-    print('Processing line: $line');
+    print('📥 Line received: $line');
     channel.sink.add(line);
     _dataController.add(line);
 
     final parts = line.split(',');
 
     if (parts.length >= 6) {
-      String latStr = parts[2];
-      String lonStr = parts[3];
+      final latStr = parts[2];
+      final lonStr = parts[3];
 
       if (latStr == 'null' || lonStr == 'null') {
         hasLocation = false;
@@ -92,11 +113,12 @@ class SerialReaderProvider extends ChangeNotifier {
         lon = double.tryParse(lonStr) ?? 0.0;
         hasLocation = (lat != 0.0 || lon != 0.0);
       }
+
       temp1 = (double.tryParse(parts[4])?.toInt() ?? 0).toString();
       temp2 = (double.tryParse(parts[5])?.toInt() ?? 0).toString();
       notifyListeners();
     } else {
-      print('Invalid data format: expected 6 parts, got ${parts.length}');
+      print('⚠️ Invalid data format: expected 6 parts, got ${parts.length}');
     }
   }
 
@@ -109,7 +131,7 @@ class SerialReaderProvider extends ChangeNotifier {
       _dataController.close();
       super.dispose();
     } catch (e) {
-      print('Exception during dispose: $e');
+      print('⚠️ Exception during dispose: $e');
     }
   }
 }
