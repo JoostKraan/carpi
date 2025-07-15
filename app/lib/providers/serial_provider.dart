@@ -9,7 +9,7 @@ class SerialReaderProvider extends ChangeNotifier {
   static final String portName = dotenv.env['PORT_NAME']!;
   WebSocketChannel? channel;
   Timer? _reconnectTimer;
-  bool _isWebSocketConnected = false;
+  bool _isConnected = false;
 
   late final SerialPort esp32Port;
   SerialPortReader? reader;
@@ -27,80 +27,12 @@ class SerialReaderProvider extends ChangeNotifier {
   String _buffer = '';
 
   SerialReaderProvider() {
-    print("Initializing SerialReaderProvider with port: $portName");
     _initializeWebSocket();
-    _initializeSerial();
-  }
 
-  void _initializeWebSocket() {
-    try {
-      print('🔌 Connecting to WebSocket...');
-      channel = WebSocketChannel.connect(
-        Uri.parse('ws://192.168.1.69:8765'),
-      );
-
-      // Listen for WebSocket events
-      channel!.stream.listen(
-            (data) {
-          print('📨 WebSocket received: $data');
-          _isWebSocketConnected = true;
-        },
-        onError: (error) {
-          print('❌ WebSocket error: $error');
-          _isWebSocketConnected = false;
-          _scheduleReconnect();
-        },
-        onDone: () {
-          print('⚠️ WebSocket connection closed');
-          _isWebSocketConnected = false;
-          _scheduleReconnect();
-        },
-      );
-
-      // Test connection by sending a ping
-      Future.delayed(const Duration(seconds: 1), () {
-        _sendWebSocketMessage('ping');
-      });
-
-    } catch (e) {
-      print('Failed to initialize WebSocket: $e');
-      _scheduleReconnect();
-    }
-  }
-
-  void _scheduleReconnect() {
-    _reconnectTimer?.cancel();
-    _reconnectTimer = Timer(const Duration(seconds: 5), () {
-      print('Attempting to reconnect WebSocket...');
-      _initializeWebSocket();
-    });
-  }
-
-  void _sendWebSocketMessage(String message) {
-    if (_isWebSocketConnected && channel != null) {
-      try {
-        channel!.sink.add(message);
-        print('WebSocket sent: $message');
-      } catch (e) {
-        print('Failed to send WebSocket message: $e');
-        _isWebSocketConnected = false;
-        _scheduleReconnect();
-      }
-    } else {
-      print('⚠️ WebSocket not connected, cannot send: $message');
-    }
-  }
-
-  void _initializeSerial() {
-    // Debug list of ports
     final ports = SerialPort.availablePorts;
-    print("Available ports: ${ports.isEmpty ? '(none)' : ''}");
-    for (final p in ports) {
-      print(" - $p");
-    }
 
     if (!ports.contains(portName)) {
-      print("ERROR: Port '$portName' not found in available ports.");
+      print('ERROR: Port $portName not found in available ports');
       return;
     }
 
@@ -111,14 +43,49 @@ class SerialReaderProvider extends ChangeNotifier {
     });
   }
 
+  void _initializeWebSocket() {
+    try {
+      channel = WebSocketChannel.connect(
+        Uri.parse('ws://192.168.1.69:8765'),
+      );
+
+      channel!.stream.listen(
+            (data) {
+          _isConnected = true;
+          print('WebSocket connected successfully');
+        },
+        onError: (error) {
+          print('WebSocket error: $error');
+          _isConnected = false;
+          _scheduleReconnect();
+        },
+        onDone: () {
+          print('WebSocket connection closed');
+          _isConnected = false;
+          _scheduleReconnect();
+        },
+      );
+
+    } catch (e) {
+      print('Failed to initialize WebSocket: $e');
+      _isConnected = false;
+      _scheduleReconnect();
+    }
+  }
+
+  void _scheduleReconnect() {
+    _reconnectTimer?.cancel();
+    _reconnectTimer = Timer(const Duration(seconds: 5), () {
+      _initializeWebSocket();
+    });
+  }
+
   void _startReading() {
     try {
-      print('Opening serial port...');
       if (!esp32Port.openReadWrite()) {
         print('Failed to open serial port: ${SerialPort.lastError}');
         return;
       }
-      print('Serial port opened: ${esp32Port.name}');
 
       final config = SerialPortConfig()
         ..baudRate = 115200
@@ -133,22 +100,16 @@ class SerialReaderProvider extends ChangeNotifier {
 
       try {
         esp32Port.config = config;
-        print('Serial port configuration set successfully');
       } catch (configError) {
         print('Failed to set full config, trying minimal config: $configError');
-
-        // Fallback: Try minimal configuration
         try {
           final minimalConfig = SerialPortConfig()
             ..baudRate = 115200;
           esp32Port.config = minimalConfig;
-          print('Minimal configuration set successfully');
         } catch (minimalError) {
           print('Even minimal config failed: $minimalError');
-          // Continue anyway - some systems work with default config
         }
       }
-
 
       Future.delayed(const Duration(milliseconds: 100), () {
         _setupReader();
@@ -156,13 +117,12 @@ class SerialReaderProvider extends ChangeNotifier {
 
     } catch (e, stackTrace) {
       print('Exception during _startReading: $e');
-      print('Stack trace:\n$stackTrace');
+      print('Stack trace: $stackTrace');
     }
   }
 
   void _setupReader() {
     try {
-
       reader = SerialPortReader(esp32Port);
       reader!.stream.listen(
             (Uint8List data) {
@@ -178,26 +138,29 @@ class SerialReaderProvider extends ChangeNotifier {
         },
         onError: (e, stackTrace) {
           print('Serial read error: $e');
-          print('Stack trace:\n$stackTrace');
+          print('Stack trace: $stackTrace');
         },
-        onDone: () => print('ℹ️ Serial reader closed'),
+        onDone: () => print('Serial reader closed'),
       );
 
       isReading = true;
       print('Serial reader started successfully');
     } catch (e, stackTrace) {
       print('Exception during _setupReader: $e');
-      print('Stack trace:\n$stackTrace');
+      print('Stack trace: $stackTrace');
     }
   }
 
   void _processLine(String line) {
-    print('Line received: $line');
+    if (_isConnected && channel != null) {
+      try {
+        channel!.sink.add(line);
+      } catch (e) {
+        print('Failed to send to WebSocket: $e');
+        _isConnected = false;
+      }
+    }
 
-    // Send to WebSocket with better error handling
-    _sendWebSocketMessage(line);
-
-    // Send to local stream
     _dataController.add(line);
 
     final parts = line.split(',');
@@ -223,17 +186,6 @@ class SerialReaderProvider extends ChangeNotifier {
       print('Invalid data format: expected 6 parts, got ${parts.length}');
     }
   }
-
-  // Method to manually reconnect WebSocket
-  void reconnectWebSocket() {
-    _reconnectTimer?.cancel();
-    channel?.sink.close();
-    _isWebSocketConnected = false;
-    _initializeWebSocket();
-  }
-
-
-  bool get isWebSocketConnected => _isWebSocketConnected;
 
   @override
   void dispose() {
