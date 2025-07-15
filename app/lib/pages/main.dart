@@ -33,7 +33,6 @@ void main() async {
     FullScreen.setFullScreen(false);
   }
 
-
   final serialProvider = SerialReaderProvider();
   runApp(
     MultiProvider(
@@ -79,6 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool showSettings = false;
   int _currentIndex = 0;
   final List<Widget> _carouselItems = [MusicPlayer(), carInfo()];
+  MapController mapController = MapController();
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final lon = context.watch<SerialReaderProvider>().lon;
     final hasGps = context.watch<SerialReaderProvider>().hasLocation;
 
+
     return Scaffold(
       backgroundColor: constants.primaryColor,
       extendBodyBehindAppBar: true,
@@ -100,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Positioned(
             child: FlutterMap(
+              mapController: mapController,
               children: [
                 TileLayer(
                   retinaMode: true,
@@ -111,10 +113,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     if (hasGps)
                       Marker(
                         point: LatLng(lat, lon),
-                        width: 50,
-                        height: 50,
+                        width: constants.iconSize,
+                        height: constants.iconSize,
                         child: SvgPicture.asset(
-                          'assets/icons/Ford-logo-flat.svg',
+                          color: constants.accentColor,
+                          'assets/icons/car.svg',
                         ),
                       ),
                   ],
@@ -197,12 +200,24 @@ class _MyHomePageState extends State<MyHomePage> {
                       context.read<ConstantsProvider>().toggleDarkMode(),
                   icon: SvgPicture.asset(
                     color: constants.iconColor,
-                    context.read<ConstantsProvider>().isDarkMode ?  'assets/icons/dark-mode.svg' :
-                    'assets/icons/light-mode.svg',
-                    width: constants.iconSize * 1,
-                    height: constants.iconSize * 1,
+                    context.read<ConstantsProvider>().isDarkMode
+                        ? 'assets/icons/dark-mode.svg'
+                        : 'assets/icons/light-mode.svg',
+                    width: constants.iconSize,
+                    height: constants.iconSize,
                   ),
                 ),
+                IconButton(
+                  onPressed: () {
+                    mapController.move(LatLng(lat, lon), 13);
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/icons/compass.svg',
+                    width: constants.iconSize,
+                    height: constants.iconSize,
+                  ),
+                ),
+
               ],
             ),
           ),
