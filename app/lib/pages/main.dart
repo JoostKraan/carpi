@@ -92,7 +92,6 @@ class _MyHomePageState extends State<MyHomePage> {
     final lon = context.watch<SerialReaderProvider>().lon;
     final hasGps = context.watch<SerialReaderProvider>().hasLocation;
 
-
     return Scaffold(
       backgroundColor: constants.primaryColor,
       extendBodyBehindAppBar: true,
@@ -103,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: FlutterMap(
               options: MapOptions(
                 interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.all, 
+                  flags: InteractiveFlag.all,
                 ),
               ),
               mapController: mapController,
@@ -222,7 +221,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: constants.iconSize,
                   ),
                 ),
-
               ],
             ),
           ),
@@ -536,6 +534,25 @@ class _MyHomePageState extends State<MyHomePage> {
             height: screenSize.height - 100,
             width: screenSize.width,
             child: Container(child: showSettings ? Settings() : null),
+          ),
+          GestureDetector(
+            onScaleStart: (details) {
+              debugPrint("Scale started with ${details.pointerCount} fingers");
+            },
+            onScaleUpdate: (details) {
+              debugPrint(
+                "Scaling... ${details.scale} with ${details.pointerCount} fingers",
+              );
+            },
+            child: Container(
+              color: Colors.blueGrey,
+              child: const Center(
+                child: Text(
+                  "Pinch or Zoom here",
+                  style: TextStyle(fontSize: 24, color: Colors.white),
+                ),
+              ),
+            ),
           ),
         ],
       ),
