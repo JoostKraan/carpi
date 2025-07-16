@@ -101,6 +101,11 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Positioned(
             child: FlutterMap(
+              options: MapOptions(
+                interactionOptions: const InteractionOptions(
+                  flags: InteractiveFlag.all, 
+                ),
+              ),
               mapController: mapController,
               children: [
                 TileLayer(
