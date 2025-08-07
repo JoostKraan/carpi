@@ -535,25 +535,6 @@ class _MyHomePageState extends State<MyHomePage> {
             width: screenSize.width,
             child: Container(child: showSettings ? Settings() : null),
           ),
-          GestureDetector(
-            onScaleStart: (details) {
-              debugPrint("Scale started with ${details.pointerCount} fingers");
-            },
-            onScaleUpdate: (details) {
-              debugPrint(
-                "Scaling... ${details.scale} with ${details.pointerCount} fingers",
-              );
-            },
-            child: Container(
-              color: Colors.blueGrey,
-              child: const Center(
-                child: Text(
-                  "Pinch or Zoom here",
-                  style: TextStyle(fontSize: 24, color: Colors.white),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
